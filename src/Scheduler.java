@@ -4,24 +4,30 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Scheduler {
-	
+	private Clock clock;
+	private double T_oss; // intervallo di osservazione Delta T
 	RandomGenerator rg;
 	UniformGenerator RoutingM1Out, RoutingM4Out; // Routing job uscenti dal centro 1 e dal centro 4
 	ExponentialGenerator C1; // Esponenziale per il centro 1
 	KErlangGenerator C4; // Generatore 2-Elang per il tempo di servizio del centro 4
 	HyperExpGenerator C2, C3;
 	private List<Job> CodaM1Fifo, CodaM2Lifo, CodaM3Lifo, CodaM4Sptf;
-	
-	
-	
-	
+	private List<Event> calendar;
+	private boolean occupatoC1;
+	private boolean occupatoC2;
+	private boolean occupatoC3;
+	private boolean occupatoC4;
 	
 	public Scheduler() {
+		clock = new Clock();
+		T_oss=10;
 		InizializzaGeneratori(0.8, 0.8, 0.4, 0.7, 0.3); // mu1, mu2, mu3, m4, p (per Hyperexp)
 		InizializzaCode();
+		calendar = new ArrayList<Event>(); // istanzio il calendar
 		
-
-		
+		double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
+		addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
+		addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
 	}
 	
 	public ArrayList<Integer> run() { // simulo un run dello scheduler
@@ -57,5 +63,34 @@ public class Scheduler {
 		CodaM4Sptf = new ArrayList<Job>();
 	}
 
+	
+	// aggiungo un evento al calendario e lo ordino per tempo di clock
+	private void addEvent(Event newEvent)
+	{
+		calendar.add(newEvent);
+
+		if (calendar.size() > 1) {
+			Collections.sort(calendar, new Comparator<Event>() {
+				public int compare(Event event1, Event event2) {
+					return Double.compare(event1.getE_time(), event2.getE_time());
+				}
+			});
+		}
+	}
+	
+	// aggiungo un job alla coda SPTF e li ordino in base al tempo di processamento
+	private void addJobToSPTF(Job newJob)
+	{
+		CodaM4Sptf.add(newJob);
+
+		if (CodaM4Sptf.size() > 1) {
+			Collections.sort(CodaM4Sptf, new Comparator<Job>() {
+				public int compare(Job job1, Job job2) {
+					return Double.compare(job1.getProcessingTime(), job2.getProcessingTime());
+				}
+			});
+		}
+	}
+	
 
 }

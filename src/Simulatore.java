@@ -5,15 +5,9 @@ import java.util.Scanner;
 public class Simulatore {
 	
 	/* DICHIARAZIONE VARIABILI E STRUTTURE DATI */
-	private Clock clock;
-
-	private List<Job> CodaM1Fifo, CodaM2Lifo, CodaM3Lifo, CodaM4Sptf;
-	private List<Event> calendar;
+	
 	private Scheduler scheduler;	 //scheduler per circuito come da prova in aula
-	private boolean occupatoC1;
-	private boolean occupatoC2;
-	private boolean occupatoC3;
-	private boolean occupatoC4;
+
 	private Job j1,j2,j3,j4,j5; 
 	private double mu1, mu2, m3, m4; // parametri dei centri di servizio
 	private int n0; //variabile numero osservazioni da effettuare nei run di stabilizzazione
@@ -21,7 +15,7 @@ public class Simulatore {
 	private int p_run; //variabile che indica il numero di run da effettuare per la stabilizz.
 	private int p_batch; //variabile che indica il numero di run da effettuare per run statistico
 	private int NJobOut; // num di job che escono lungo la linea GammaOut
-	private double T_oss; // intervallo di osservazione Delta T
+	
 	private ArrayList<Double> array_oss = new ArrayList<Double>();
 	private ArrayList<Double> array_batch = new ArrayList<Double>();
 	private ArrayList<Double> mediaC = new ArrayList<Double>(); // Gordon

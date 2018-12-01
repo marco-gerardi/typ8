@@ -2,10 +2,10 @@ public class Event {
 	
 	//dichiarazione e inizializzazione variabili che rappresentano gli eventi
 	public final static int NUM_EVENT_TYPES = 6;
-	public final static int M1 = 0;
-	public final static int M2 = 1;
-	public final static int M3 = 2;
-	public final static int M4 = 3;
+	public final static int Fine_M1 = 0;
+	public final static int Fine_M2 = 1;
+	public final static int Fine_M3 = 2;
+	public final static int Fine_M4 = 3;
 	public final static int OSSERVAZIONE = 4;
 	public final static int FINESIM = 5;
 	public final static double INFINITY = Double.MAX_VALUE;
