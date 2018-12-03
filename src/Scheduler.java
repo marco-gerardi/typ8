@@ -127,7 +127,7 @@ public class Scheduler {
 		calendar.remove(0); // rimuovo l'evento dal calendario
 		NX = RoutingM1Out.getNextNumber();
 		System.out.println(NX);
-		if(NX > 0.3 && NX <= 0.7) {// il job va verso il centro M2
+		if(NX >= 0.3) {// il job va verso il centro M2
 			if (!occupatoM2) {
 				occupatoM2=true; // occupo M2 col job
 				Fine_M2 = new Machine2(5, 7, 0.8, 0.3);
