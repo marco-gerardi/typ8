@@ -6,23 +6,17 @@ import java.util.List;
 public class Scheduler {
 	private Clock clock;
 	private double T_oss; // intervallo di osservazione Delta T
-	private int n;
 	RandomGenerator rg;
 	UniformGenerator RoutingM1Out, RoutingM4Out; // Routing job uscenti dal centro 1 e dal centro 4
 	ExponentialGenerator C1; // Esponenziale per il centro 1
 	KErlangGenerator C4; // Generatore 2-Elang per il tempo di servizio del centro 4
 	HyperExpGenerator C2, C3;
-	Machine1 Fine_M1;
-	Machine2 Fine_M2;
-	//private Job jobM1, jobM2, jobM3, jobM4;
+
 	private List<Job> CodaM1Fifo, CodaM2Lifo, CodaM3Lifo, CodaM4Sptf;
 	private List<Event> calendar;
-	private boolean occupatoM1;
-	private boolean occupatoM2;
-	private boolean occupatoM3;
-	private boolean occupatoM4;
+	private Machine M1, M2, M3, M4;
 	private String FASE_SIMULAZIONE = "stabilizzazione";
-    boolean fineM = false;
+    //boolean fineM = false;
     double NX;
     String NXMachine;
     int next; // contiene il prossimo evento prelevato dal calendario eventi
@@ -39,20 +33,15 @@ public class Scheduler {
 		job3=new Job(3);
 		job4=new Job(4);
 		job5=new Job(5);
-		occupatoM1=false;
-		occupatoM2=false;
-		occupatoM3=false;
-		occupatoM4=false;
-		
-		
-		//jobM1 = new Job();
-		Fine_M1 = new Machine1(0.8,5);
-		//double TM1new = Fine_M1.getTimeServiceCentro(jobM1);
-		//System.out.println(TM1new);
+		M1=new Machine("M1");
+		M2=new Machine("M2");
+		M3=new Machine("M3");
+		M4=new Machine("M4");
+
 		double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
 		System.out.println(TM1);
-		addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
-		addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
+		//addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
+		//addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
 	}
 	
 	public ArrayList<Integer> run(int n) { // simulo un run dello scheduler
@@ -64,7 +53,16 @@ public class Scheduler {
 		CodaM1Fifo.add(job3);
 		CodaM1Fifo.add(job4);
 		CodaM1Fifo.add(job5);
-	
+		double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
+		System.out.println(TM1);
+		addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
+		addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
+		addEvent(new Event(Event.Fine_M2, Event.INFINITY )); // imposto M2 a evento non prevedibile
+		addEvent(new Event(Event.Fine_M3, Event.INFINITY )); // imposto M2 a evento non prevedibile
+		addEvent(new Event(Event.Fine_M4, Event.INFINITY )); // imposto M2 a evento non prevedibile
+		addEvent(new Event(Event.FINESIM, Event.INFINITY )); // imposto Finesim a evento non prevedibile
+		M1.setJob(CodaM1Fifo.remove(0)); // rimuovo job dalla coda M1 e lo metto dentro M1
+		
 
         
         while (Throughtput.size()<n) {
@@ -128,17 +126,17 @@ public class Scheduler {
 		NX = RoutingM1Out.getNextNumber();
 		System.out.println(NX);
 		if(NX >= 0.3) {// il job va verso il centro M2
-			if (!occupatoM2) {
-				occupatoM2=true; // occupo M2 col job
-				Fine_M2 = new Machine2(5, 7, 0.8, 0.3);
-				double TM2 = Fine_M2.getTimeServiceCentro(job1); // genero il tempo di servizio del centro2 M2
-				addEvent(new Event(Event.Fine_M2, clock.getSimTime() + TM2)); // schedulo evento tM2 = clock + TM2(J)
-				System.out.println(TM2);
+			if (M2.statoLibero()) {
+				M2.setJob(M1.getJob()); // occupo M2 col job che prima era in M1
+				//Fine_M2 = new Machine2(5, 7, 0.8, 0.3);
+				//double TM2 = Fine_M2.getTimeServiceCentro(job1); // genero il tempo di servizio del centro2 M2
+				//addEvent(new Event(Event.Fine_M2, clock.getSimTime() + TM2)); // schedulo evento tM2 = clock + TM2(J)
+				//System.out.println(TM2);
 			}
 			else {
 				// inserisco job in coda
-				Fine_M2.push(job1);
-				System.out.println(Fine_M2.getJob());
+				//Fine_M2.push(job1);
+				//System.out.println(Fine_M2.getJob());
 			}
 			 NXMachine = "Fine_M2";
          }else  {// il job va verso il centro M3
