@@ -4,9 +4,10 @@
 /HyperExpGenerator.class
 /Job.class
 /KErlangGenerator.class
+/Machine1.class
 /RandomGenerator.class
-/Simulatore.class
-/UniformGenerator.class
-/Scheduler.class
 /Scheduler$1.class
 /Scheduler$2.class
+/Scheduler.class
+/Simulatore.class
+/UniformGenerator.class

@@ -8,7 +8,7 @@ public class Simulatore {
 	
 	private Scheduler scheduler;	 //scheduler per circuito come da prova in aula
 
-	private Job j1,j2,j3,j4,j5; 
+	 
 	private double mu1, mu2, m3, m4; // parametri dei centri di servizio
 	private int n0; //variabile numero osservazioni da effettuare nei run di stabilizzazione
 	private int n_osservazione; //num di osservazioni crescenti per run stab che vanno da 1 a n0
@@ -23,7 +23,7 @@ public class Simulatore {
 	private ArrayList<Double> varianza = new ArrayList<Double>();// Gordon
 	ArrayList<Integer> Throughtput = new ArrayList<Integer>();
 	private int i,j; // variabili per i contatori
-	
+	public String FASE_SIMULAZIONE;
 	public static void main(String[] args)
 	{
 		new Simulatore();
@@ -33,14 +33,16 @@ public class Simulatore {
 
 	public Simulatore() {
 		System.out.println("Costruttore del simulatore");
+		
 		scheduler = new Scheduler(); // istanzio lo scheduler
 		n0=200;
-		for ( i = 0; i < n0; i++) { 
+		for ( i = 1; i <= n0; i++) { 
 			System.out.println("**** Ciclo: "+i+" ****************");
 			Throughtput= scheduler.run(i);
-			
+			System.out.println("lunghezza della lista Throughtput: "+ Throughtput.size());
 			// TODO: calcola media campionaria di ogni run
 		}
+		
 		
 		//TODO: stampa delle curve di Gordon della media campionaria, della media e della varianza
 		

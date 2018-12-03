@@ -13,16 +13,18 @@ public class Scheduler {
 	KErlangGenerator C4; // Generatore 2-Elang per il tempo di servizio del centro 4
 	HyperExpGenerator C2, C3;
 	Machine1 Fine_M1;
-	private Job jobM1, jobM2, jobM3, jobM4;
+	//private Job jobM1, jobM2, jobM3, jobM4;
 	private List<Job> CodaM1Fifo, CodaM2Lifo, CodaM3Lifo, CodaM4Sptf;
 	private List<Event> calendar;
-	private boolean occupatoC1;
-	private boolean occupatoC2;
-	private boolean occupatoC3;
-	private boolean occupatoC4;
+	private boolean occupatoM1;
+	private boolean occupatoM2;
+	private boolean occupatoM3;
+	private boolean occupatoM4;
 	private String FASE_SIMULAZIONE = "stabilizzazione";
     boolean fineM = false;
     String NX;
+    int next; // contiene il prossimo evento prelevato dal calendario eventi
+    private Job job1,job2,job3,job4,job5;
 	
 	public Scheduler() {
 		clock = new Clock();
@@ -30,11 +32,21 @@ public class Scheduler {
 		InizializzaGeneratori(0.8, 0.8, 0.4, 0.7, 0.3); // mu1, mu2, mu3, m4, p (per Hyperexp)
 		InizializzaCode();
 		calendar = new ArrayList<Event>(); // istanzio il calendar
+		job1=new Job();// istanzio i job
+		job2=new Job();
+		job3=new Job();
+		job4=new Job();
+		job5=new Job();
+		occupatoM1=false;
+		occupatoM2=false;
+		occupatoM3=false;
+		occupatoM4=false;
 		
-		jobM1 = new Job();
+		
+		//jobM1 = new Job();
 		Fine_M1 = new Machine1(0.8,5);
-		double TM1new = Fine_M1.getTimeServiceCentro(jobM1);
-		System.out.println(TM1new);
+		//double TM1new = Fine_M1.getTimeServiceCentro(jobM1);
+		//System.out.println(TM1new);
 		double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
 		System.out.println(TM1);
 		addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
@@ -42,28 +54,52 @@ public class Scheduler {
 	}
 	
 	public ArrayList<Integer> run(int n) { // simulo un run dello scheduler
+		//vettore osservazione Throughtput nel sistema
 		ArrayList<Integer> Throughtput = new ArrayList<Integer>();
-		
-		System.out.println("Rnd: "+rg.getNextNumber());
-		System.out.println("RoutingM1Out: "+RoutingM1Out.getNextNumber());
-		System.out.println("RoutingM4Out: "+RoutingM4Out.getNextNumber());
-		System.out.println("Exp: "+C1.getNextExp());
-		System.out.println("HypC2: "+C2.getNextHyperExp());
-		System.out.println("HypC3: "+C3.getNextHyperExp());
-		System.out.println("K-Erl M4: "+C4.getNextNumber());
-		System.out.println("------------------------------");	
+		// aggiungo i 5 job alla coda M1 - fase iniziale
+		CodaM1Fifo.add(job1); 
+		CodaM1Fifo.add(job2);
+		CodaM1Fifo.add(job3);
+		CodaM1Fifo.add(job4);
+		CodaM1Fifo.add(job5);
+	
 
-        int next = calendar.get(0).getE_id();
-        //while (FASE_SIMULAZIONE == "stabilizzazione") {
-            switch (next) {
-                case Event.Fine_M1:
-                    simFineM1(RoutingM1Out.getNextNumber());
-                    break;
+        
+        while (Throughtput.size()<n) {
+        	// guardo il calendario e vedo qual'è il primo evento
+        	next = calendar.get(0).getE_id();
+        	switch (next) {
+        	case Event.Fine_M1:
+        		simFineM1();
+        		break;
+        	case Event.Fine_M2:
+        		// routine 
+        		break;
+        	case Event.Fine_M3:
+        		// routine 
+        		break;
+        	case Event.Fine_M4:
+        		// routine 
+        		break;
+        	case Event.OSSERVAZIONE:
+        		Osservazione();
+        		break;
+        	case Event.FINESIM:
+        		// routine 
+        		break;
 
-            } 
-        //}
+        	} 
+        }
 				
 		return Throughtput; 	
+//		System.out.println("Rnd: "+rg.getNextNumber());
+//		System.out.println("RoutingM1Out: "+RoutingM1Out.getNextNumber());
+//		System.out.println("RoutingM4Out: "+RoutingM4Out.getNextNumber());
+//		System.out.println("Exp: "+C1.getNextExp());
+//		System.out.println("HypC2: "+C2.getNextHyperExp());
+//		System.out.println("HypC3: "+C3.getNextHyperExp());
+//		System.out.println("K-Erl M4: "+C4.getNextNumber());
+//		System.out.println("------------------------------");	
 	}
 
 	private void InizializzaGeneratori(double mu1, double mu2, double mu3, double mu4, double p) {
@@ -83,20 +119,33 @@ public class Scheduler {
 		CodaM4Sptf = new ArrayList<Job>();
 	}
 
-	private void simFineM1(double routing){
-		 if(routing > 0.3 && routing <= 0.7) {
+	private void simFineM1(){
+		clock.setSimTime(calendar.get(0).getE_time()); // aggiorno il clock
+		calendar.remove(0); // rimuovo l'evento dal calendario
+		
+		if(RoutingM1Out.getNextNumber() < 0.3) {// il job va verso il centro M2
+			if (occupatoM2) {
+				// inserisco job in coda
+			}
+			else {
+				occupatoM2=true; // occupo M2 col job
+			}
 			 NX = "Fine_M2";
-         }else if(routing > 0 && routing <= 0.3) {
+         }else  {// il job va verso il centro M3
         	 NX = "Fine_M3";
          }
 		 System.out.println("Route " + NX);
+		 
+	}
+	
+	private void Osservazione(){
+		 calendar.remove(0);
 	}
 	
 	// aggiungo un evento al calendario e lo ordino per tempo di clock
 	private void addEvent(Event newEvent)
 	{
 		calendar.add(newEvent);
-
 		if (calendar.size() > 1) {
 			Collections.sort(calendar, new Comparator<Event>() {
 				public int compare(Event event1, Event event2) {
@@ -110,7 +159,6 @@ public class Scheduler {
 	private void addJobToSPTF(Job newJob)
 	{
 		CodaM4Sptf.add(newJob);
-
 		if (CodaM4Sptf.size() > 1) {
 			Collections.sort(CodaM4Sptf, new Comparator<Job>() {
 				public int compare(Job job1, Job job2) {
