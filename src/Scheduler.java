@@ -130,23 +130,40 @@ public class Scheduler {
 		if(NX >= 0.3) {// il job va verso il centro M2
 			if (M2.statoLibero()) {
 				M2.setJob(M1.getJob()); // occupo M2 col job che prima era in M1
-				//Fine_M2 = new Machine2(5, 7, 0.8, 0.3);
-				//double TM2 = Fine_M2.getTimeServiceCentro(job1); // genero il tempo di servizio del centro2 M2
-				//addEvent(new Event(Event.Fine_M2, clock.getSimTime() + TM2)); // schedulo evento tM2 = clock + TM2(J)
-				//System.out.println(TM2);
+				double TM2=C2.getNextHyperExp();// prevedo tempo di servizio  Tm2(j) 
+				addEvent(new Event(Event.Fine_M2, clock.getSimTime() + TM2)); // prevedo il prox evento di fine M2
+				System.out.println("TM2: "+TM2);
 			}
 			else {
-				// inserisco job in coda
-				//Fine_M2.push(job1);
-				//System.out.println(Fine_M2.getJob());
+				CodaM2Lifo.add(M1.getJob()); // inserisco job in coda M2
+				System.out.println("Il job è stato inserito in codaM2");
 			}
-			 NXMachine = "Fine_M2";
+			 NXMachine = " vado verso Fine_M2";
          }else  {// il job va verso il centro M3
-        	 NXMachine = "Fine_M3";
+ 			if (M3.statoLibero()) {
+				M3.setJob(M1.getJob()); // occupo M3 col job che prima era in M1
+				double TM3=C3.getNextHyperExp();// prevedo tempo di servizio  Tm3(j) 
+				addEvent(new Event(Event.Fine_M3, clock.getSimTime() + TM3)); // prevedo il prox evento di fine M3
+				System.out.println("TM3: "+TM3);
+			}
+			else {
+				CodaM3Lifo.add(M1.getJob()); // inserisco job in coda M3
+				System.out.println("Il job è stato inserito in codaM3");
+			}
+      	 
+        	 NXMachine = "vado verso Fine_M3";
          }
-		 System.out.println("Route " + NXMachine);
-		 
-	}
+		
+		if (CodaM1Fifo.isEmpty()) {
+			addEvent(new Event(Event.Fine_M1, Event.INFINITY )); // imposto M1 a evento non prevedibile
+		}
+		else {
+			M1.setJob(CodaM1Fifo.remove(0)); // rimuovo job dalla coda M1 e lo metto dentro M1
+			double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
+			addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1			
+		}
+		 System.out.println("Route " + NXMachine); 
+	} // fine evento FineM1
 	
 	private void Osservazione(){
 		 calendar.remove(0);
