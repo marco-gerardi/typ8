@@ -7,7 +7,7 @@ public class Machine {
 	 * Costruttore oggetto Machine
 	 * @param idMachine = identificativo della Machine
 	 */
-	public Machine (String idMachinee){ this.idMachine = idMachine; }
+	public Machine (String idMachine){ this.idMachine = idMachine; }
 	
 	/***
 	 * Controlla se la machine non contiene job al suo interno
@@ -27,7 +27,7 @@ public class Machine {
 	 * @param job = job da assegnare
 	 */
 	public void setJob(Job job){ this.job=job; }
-	public String getIdProcessore() { return idMachine; }
-	public void setIdProcessore(String idProcessore) { 	this.idMachine = idMachine; }
+	public String getIdMachine() { return idMachine; }
+	public void setIdProcessore(String idMachine) { 	this.idMachine = idMachine; }
 	public Job getJob() { return job; 	}
 }
