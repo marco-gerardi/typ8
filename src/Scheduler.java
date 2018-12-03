@@ -6,17 +6,23 @@ import java.util.List;
 public class Scheduler {
 	private Clock clock;
 	private double T_oss; // intervallo di osservazione Delta T
+	private int n;
 	RandomGenerator rg;
 	UniformGenerator RoutingM1Out, RoutingM4Out; // Routing job uscenti dal centro 1 e dal centro 4
 	ExponentialGenerator C1; // Esponenziale per il centro 1
 	KErlangGenerator C4; // Generatore 2-Elang per il tempo di servizio del centro 4
 	HyperExpGenerator C2, C3;
+	Machine1 Fine_M1;
+	private Job jobM1, jobM2, jobM3, jobM4;
 	private List<Job> CodaM1Fifo, CodaM2Lifo, CodaM3Lifo, CodaM4Sptf;
 	private List<Event> calendar;
 	private boolean occupatoC1;
 	private boolean occupatoC2;
 	private boolean occupatoC3;
 	private boolean occupatoC4;
+	private String FASE_SIMULAZIONE = "stabilizzazione";
+    boolean fineM = false;
+    String NX;
 	
 	public Scheduler() {
 		clock = new Clock();
@@ -25,12 +31,17 @@ public class Scheduler {
 		InizializzaCode();
 		calendar = new ArrayList<Event>(); // istanzio il calendar
 		
+		jobM1 = new Job();
+		Fine_M1 = new Machine1(0.8,5);
+		double TM1new = Fine_M1.getTimeServiceCentro(jobM1);
+		System.out.println(TM1new);
 		double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
+		System.out.println(TM1);
 		addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
 		addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
 	}
 	
-	public ArrayList<Integer> run() { // simulo un run dello scheduler
+	public ArrayList<Integer> run(int n) { // simulo un run dello scheduler
 		ArrayList<Integer> Throughtput = new ArrayList<Integer>();
 		
 		System.out.println("Rnd: "+rg.getNextNumber());
@@ -41,7 +52,16 @@ public class Scheduler {
 		System.out.println("HypC3: "+C3.getNextHyperExp());
 		System.out.println("K-Erl M4: "+C4.getNextNumber());
 		System.out.println("------------------------------");	
-		
+
+        int next = calendar.get(0).getE_id();
+        //while (FASE_SIMULAZIONE == "stabilizzazione") {
+            switch (next) {
+                case Event.Fine_M1:
+                    simFineM1(RoutingM1Out.getNextNumber());
+                    break;
+
+            } 
+        //}
 				
 		return Throughtput; 	
 	}
@@ -63,6 +83,14 @@ public class Scheduler {
 		CodaM4Sptf = new ArrayList<Job>();
 	}
 
+	private void simFineM1(double routing){
+		 if(routing > 0.3 && routing <= 0.7) {
+			 NX = "Fine_M2";
+         }else if(routing > 0 && routing <= 0.3) {
+        	 NX = "Fine_M3";
+         }
+		 System.out.println("Route " + NX);
+	}
 	
 	// aggiungo un evento al calendario e lo ordino per tempo di clock
 	private void addEvent(Event newEvent)

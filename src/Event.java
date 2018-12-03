@@ -14,6 +14,13 @@ public class Event {
 	private int e_id;
 	private double e_time;
 
+	
+	//costruttore
+	public Event(int e_id)
+	{
+		this.e_id = e_id;
+	}
+	
 	//costruttore
 	public Event(int e_id, double e_time)
 	{

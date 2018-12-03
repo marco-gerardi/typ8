@@ -37,7 +37,7 @@ public class Simulatore {
 		n0=200;
 		for ( i = 0; i < n0; i++) { 
 			System.out.println("**** Ciclo: "+i+" ****************");
-			Throughtput= scheduler.run();
+			Throughtput= scheduler.run(i);
 			
 			// TODO: calcola media campionaria di ogni run
 		}
