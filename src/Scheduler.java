@@ -13,6 +13,7 @@ public class Scheduler {
 	KErlangGenerator C4; // Generatore 2-Elang per il tempo di servizio del centro 4
 	HyperExpGenerator C2, C3;
 	Machine1 Fine_M1;
+	Machine2 Fine_M2;
 	//private Job jobM1, jobM2, jobM3, jobM4;
 	private List<Job> CodaM1Fifo, CodaM2Lifo, CodaM3Lifo, CodaM4Sptf;
 	private List<Event> calendar;
@@ -22,7 +23,8 @@ public class Scheduler {
 	private boolean occupatoM4;
 	private String FASE_SIMULAZIONE = "stabilizzazione";
     boolean fineM = false;
-    String NX;
+    double NX;
+    String NXMachine;
     int next; // contiene il prossimo evento prelevato dal calendario eventi
     private Job job1,job2,job3,job4,job5;
 	
@@ -68,6 +70,7 @@ public class Scheduler {
         while (Throughtput.size()<n) {
         	// guardo il calendario e vedo qual'è il primo evento
         	next = calendar.get(0).getE_id();
+        	
         	switch (next) {
         	case Event.Fine_M1:
         		simFineM1();
@@ -122,24 +125,31 @@ public class Scheduler {
 	private void simFineM1(){
 		clock.setSimTime(calendar.get(0).getE_time()); // aggiorno il clock
 		calendar.remove(0); // rimuovo l'evento dal calendario
-		
-		if(RoutingM1Out.getNextNumber() < 0.3) {// il job va verso il centro M2
-			if (occupatoM2) {
-				// inserisco job in coda
+		NX = RoutingM1Out.getNextNumber();
+		if(NX > 0.3 && NX <= 0.7) {// il job va verso il centro M2
+			if (!occupatoM2) {
+				occupatoM2=true; // occupo M2 col job
+				Fine_M2 = new Machine2(5, 7, 0.8, 0.3);
+				double TM2 = Fine_M2.getTimeServiceCentro(job1); // genero il tempo di servizio del centro2 M2
+				addEvent(new Event(Event.Fine_M2, clock.getSimTime() + TM2)); // schedulo evento tM2 = clock + TM2(J)
+				System.out.println(TM2);
 			}
 			else {
-				occupatoM2=true; // occupo M2 col job
+				// inserisco job in coda
+				Fine_M2.push(job1);
+				
 			}
-			 NX = "Fine_M2";
+			 NXMachine = "Fine_M2";
          }else  {// il job va verso il centro M3
-        	 NX = "Fine_M3";
+        	 NXMachine = "Fine_M3";
          }
-		 System.out.println("Route " + NX);
+		 System.out.println("Route " + NXMachine);
 		 
 	}
 	
 	private void Osservazione(){
 		 calendar.remove(0);
+		 //System.out.println("Osservazione");
 	}
 	
 	// aggiungo un evento al calendario e lo ordino per tempo di clock
