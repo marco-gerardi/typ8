@@ -34,11 +34,11 @@ public class Scheduler {
 		InizializzaGeneratori(0.8, 0.8, 0.4, 0.7, 0.3); // mu1, mu2, mu3, m4, p (per Hyperexp)
 		InizializzaCode();
 		calendar = new ArrayList<Event>(); // istanzio il calendar
-		job1=new Job();// istanzio i job
-		job2=new Job();
-		job3=new Job();
-		job4=new Job();
-		job5=new Job();
+		job1=new Job(1);// istanzio i job
+		job2=new Job(2);
+		job3=new Job(3);
+		job4=new Job(4);
+		job5=new Job(5);
 		occupatoM1=false;
 		occupatoM2=false;
 		occupatoM3=false;
