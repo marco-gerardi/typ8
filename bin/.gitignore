@@ -1,13 +1,4 @@
-/Clock.class
-/Event.class
-/ExponentialGenerator.class
-/HyperExpGenerator.class
-/Job.class
-/KErlangGenerator.class
-/Machine1.class
-/RandomGenerator.class
-/Scheduler$1.class
-/Scheduler$2.class
-/Scheduler.class
-/Simulatore.class
-/UniformGenerator.class
+/Coda.class
+/CodaFIFO.class
+/CodaLIFO.class
+/Machine2.class

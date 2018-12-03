@@ -126,6 +126,7 @@ public class Scheduler {
 		clock.setSimTime(calendar.get(0).getE_time()); // aggiorno il clock
 		calendar.remove(0); // rimuovo l'evento dal calendario
 		NX = RoutingM1Out.getNextNumber();
+		System.out.println(NX);
 		if(NX > 0.3 && NX <= 0.7) {// il job va verso il centro M2
 			if (!occupatoM2) {
 				occupatoM2=true; // occupo M2 col job
@@ -137,7 +138,7 @@ public class Scheduler {
 			else {
 				// inserisco job in coda
 				Fine_M2.push(job1);
-				
+				System.out.println(Fine_M2.getJob());
 			}
 			 NXMachine = "Fine_M2";
          }else  {// il job va verso il centro M3
