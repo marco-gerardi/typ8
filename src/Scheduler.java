@@ -68,6 +68,8 @@ public class Scheduler {
         while (Throughtput.size()<n) {
         	// guardo il calendario e vedo qual'è il primo evento
         	next = calendar.get(0).getE_id();
+        	clock.setSimTime(calendar.get(0).getE_time()); // aggiorno il clock
+        	
         	
         	switch (next) {
         	case Event.Fine_M1:
@@ -121,7 +123,7 @@ public class Scheduler {
 	}
 
 	private void simFineM1(){
-		clock.setSimTime(calendar.get(0).getE_time()); // aggiorno il clock
+		
 		calendar.remove(0); // rimuovo l'evento dal calendario
 		NX = RoutingM1Out.getNextNumber();
 		System.out.println(NX);
