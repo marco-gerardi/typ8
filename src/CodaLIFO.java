@@ -12,7 +12,6 @@ public class CodaLIFO extends Coda {
 	@Override
 	public Job extract() {
 		Job pop = coda.remove(coda.size()-1);
-		
 		return pop;
 	}
 

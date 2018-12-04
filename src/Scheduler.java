@@ -123,7 +123,6 @@ public class Scheduler {
 	}
 
 	private void simFineM1(){
-		
 		calendar.remove(0); // rimuovo l'evento dal calendario
 		NX = RoutingM1Out.getNextNumber();
 		System.out.println(NX);
@@ -195,6 +194,9 @@ public class Scheduler {
 			});
 		}
 	}
-	
+	public List<Job> pop(List<Job> lista) {
+		lista.remove(lista.size()-1);
+		return lista;
+	}
 
 }
