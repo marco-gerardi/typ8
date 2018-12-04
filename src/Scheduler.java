@@ -7,7 +7,7 @@ public class Scheduler {
 	private Clock clock;
 	private double T_oss; // intervallo di osservazione Delta T
 	RandomGenerator rg;
-	UniformGenerator RoutingM1Out, RoutingM4Out; // Routing job uscenti dal centro 1 e dal centro 4
+	UniformGenerator RoutingM1Out, RoutingM2Out, RoutingM4Out; // Routing job uscenti dal centro 1 e dal centro 4
 	ExponentialGenerator C1; // Esponenziale per il centro 1
 	KErlangGenerator C4; // Generatore 2-Elang per il tempo di servizio del centro 4
 	HyperExpGenerator C2, C3;
@@ -76,7 +76,7 @@ public class Scheduler {
         		simFineM1();
         		break;
         	case Event.Fine_M2:
-        		// routine 
+        		simFineM2(); 
         		break;
         	case Event.Fine_M3:
         		// routine 
@@ -105,22 +105,28 @@ public class Scheduler {
 //		System.out.println("------------------------------");	
 	}
 
-	private void InizializzaGeneratori(double mu1, double mu2, double mu3, double mu4, double p) {
-		rg= new RandomGenerator();
-		RoutingM1Out=new UniformGenerator(5, 0, 1);// seme=5
-		RoutingM4Out=new UniformGenerator(7, 0, 1);// seme=7
-		C1=new ExponentialGenerator(5, mu1);// seme=5, mu=0.4
-		C2= new HyperExpGenerator(5, 7, mu2, p );
-		C3= new HyperExpGenerator(7, 5, mu3, p );
-		C4=new KErlangGenerator(mu4);
+	private void simFineM2() {
+		calendar.remove(0); // rimuovo l'evento dal calendario
+		NX = RoutingM2Out.getNextNumber();
+		if(NX >= 0.5) {// il job va verso il centro M1
+			if (M1.statoLibero()) {
+				M1.setJob(M2.getJob()); // occupo M1 col job che prima era in M2
+				double TM1=C1.getNextExp();// prevedo tempo di servizio  Tm1(j) 
+				addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
+				System.out.println("Il job è stato inserito in M1");
+			}
+			else {
+				CodaM1Fifo.add(M2.getJob()); // inserisco job in coda M1
+				System.out.println("Il job è stato inserito in codaM1");
+			}
+         } else { // il job va verso M4
+        	 
+         }
+		
+		
 	}
-	
-	private void InizializzaCode() {
-		CodaM1Fifo = new ArrayList<Job>();
-		CodaM2Lifo = new ArrayList<Job>();
-		CodaM3Lifo = new ArrayList<Job>();
-		CodaM4Sptf = new ArrayList<Job>();
-	}
+
+
 
 	private void simFineM1(){
 		calendar.remove(0); // rimuovo l'evento dal calendario
@@ -194,9 +200,28 @@ public class Scheduler {
 			});
 		}
 	}
+	
 	public List<Job> pop(List<Job> lista) {
-		lista.remove(lista.size()-1);
+		if (lista != null && !lista.isEmpty())  lista.remove(lista.size()-1);
 		return lista;
+	}
+	
+	private void InizializzaGeneratori(double mu1, double mu2, double mu3, double mu4, double p) {
+		rg= new RandomGenerator();
+		RoutingM1Out=new UniformGenerator(5, 0, 1);// seme=5
+		RoutingM2Out=new UniformGenerator(11, 0, 1);// seme=11
+		RoutingM4Out=new UniformGenerator(7, 0, 1);// seme=7
+		C1=new ExponentialGenerator(5, mu1);// seme=5, mu=0.4
+		C2= new HyperExpGenerator(5, 7, mu2, p );
+		C3= new HyperExpGenerator(7, 5, mu3, p );
+		C4=new KErlangGenerator(mu4);
+	}
+	
+	private void InizializzaCode() {
+		CodaM1Fifo = new ArrayList<Job>();
+		CodaM2Lifo = new ArrayList<Job>();
+		CodaM3Lifo = new ArrayList<Job>();
+		CodaM4Sptf = new ArrayList<Job>();
 	}
 
 }
