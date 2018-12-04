@@ -29,5 +29,11 @@ public class Machine {
 	public void setJob(Job job){ this.job=job; }
 	public String getIdMachine() { return idMachine; }
 	public void setIdMachine(String idMachine) { 	this.idMachine = idMachine; }
-	public Job getJob() { return job; 	}
+	
+	public Job getJob() { 
+		Job tmp = this.job;
+		this.job=null;
+		return tmp; 	
+		
+	}
 }
