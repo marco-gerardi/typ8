@@ -129,8 +129,8 @@ public class Scheduler {
  			}
  			else { // M4 è occupato
  				double TM4=C4.getNextNumber();// prevedo tempo di servizio  Tm4(j)
- 				addJobToSPTF(M1.getJob()); // inserisco job in coda M4
- 				System.out.println("Il job è stato inserito in codaM3");
+ 				addJobToSPTF(M2.getJob().setProcessingTime(TM4)); // inserisco job in coda M4 e lo ordino
+ 				System.out.println("Il job è stato inserito in codaM4");
  			}
        	 
          	 NXMachine = "vado verso Fine_M3";
