@@ -135,15 +135,24 @@ public class Scheduler {
  				System.out.println("Il job è stato inserito in codaM4");
  			}
        	 
-         	 NXMachine = "vado verso Fine_M3";
+  			System.out.println("fine M2");
           }
+			if (CodaM2Lifo.isEmpty()) {
+				addEvent(new Event(Event.Fine_M2, Event.INFINITY )); // imposto M2 a evento non prevedibile
+			}
+			else {
+				M2.setJob(CodaM2Lifo.remove(CodaM2Lifo.size()-1)); // rimuovo job dalla coda M2 e lo metto dentro M2
+				double TM2 = C2.getNextHyperExp(); // genero il tempo di servizio del centro M2
+				addEvent(new Event(Event.Fine_M2, clock.getSimTime() + TM2)); // prevedo il prox evento di fine M2			
+			}
+			 System.out.println("Route " + NXMachine);  
         	 
         	 
         	 
+ 
+			 
         	 
-        	 
-        	 
-         }
+         } // fine evento FineM2 
 		
 		
 	
