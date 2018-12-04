@@ -14,14 +14,19 @@ public class Job {
 		this.startServiceTime = startServiceTime;
 	}
 
-	public Job(int id, double processingTime)
+	public Job(double processingTime)
 	{
-		this(id,processingTime, 0);
+		this(0, processingTime, 0);
 	}
 
 	public Job(int id)
 	{
 		this(id,0, 0);
+	}
+	
+	public Job()
+	{
+		this(0,0, 0);
 	}
 
 	//metodi get che restituiscono i valori delle variabili della classe

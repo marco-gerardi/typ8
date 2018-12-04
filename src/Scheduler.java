@@ -121,10 +121,30 @@ public class Scheduler {
 			}
          } else { // il job va verso M4
         	 
+  			if (M4.statoLibero()) {
+ 				M4.setJob(M2.getJob()); // occupo M4 col job che prima era in M2
+ 				double TM4=C4.getNextNumber();// prevedo tempo di servizio  Tm4(j) 
+ 				addEvent(new Event(Event.Fine_M4, clock.getSimTime() + TM4)); // prevedo il prox evento di fine M4
+ 				System.out.println("Il job è stato inserito in M4");
+ 			}
+ 			else { // M4 è occupato
+ 				double TM4=C4.getNextNumber();// prevedo tempo di servizio  Tm4(j)
+ 				addJobToSPTF(M1.getJob()); // inserisco job in coda M4
+ 				System.out.println("Il job è stato inserito in codaM3");
+ 			}
+       	 
+         	 NXMachine = "vado verso Fine_M3";
+          }
+        	 
+        	 
+        	 
+        	 
+        	 
+        	 
          }
 		
 		
-	}
+	
 
 
 
