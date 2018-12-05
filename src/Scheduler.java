@@ -22,6 +22,17 @@ public class Scheduler {
     String NXMachine;
     int next; // contiene il prossimo evento prelevato dal calendario eventi
     private Job job1,job2,job3,job4,job5;
+    double th = 0.0;
+    private ArrayList<Double> array_oss = new ArrayList<Double>();
+    private ArrayList<Double> arrayCampionaria = new ArrayList<Double>();
+    private ArrayList<Double> array_Stimatore_Gordon = new ArrayList<Double>();
+    double sommaOss;
+	double mediaCampionaria;
+	double sommaMedia;
+	double sommaVarianza;
+	double e_n;
+	double s2_n;
+	private int p_run = 50; //variabile che indica il numero di run da effettuare per la stabilizz.
 	
 	public Scheduler() {
 		clock = new Clock();
@@ -86,7 +97,7 @@ public class Scheduler {
         		simFineM4();
         		break;
         	case Event.OSSERVAZIONE:
-        		Osservazione();
+        		Osservazione(n);
         		break;
         	case Event.FINESIM:
         		// routine 
@@ -263,9 +274,52 @@ public class Scheduler {
 		 System.out.println("Route " + NXMachine); 
 	} // fine evento FineM1
 	
-	private void Osservazione(){
-		 calendar.remove(0);
+	private void Osservazione(int n){
+		
+		calendar.remove(0);
 		 //System.out.println("Osservazione");
+		th = NJobOut/T_oss; // calcolo throughput
+		array_oss.add(th); // memorizzo th nell'array
+		NJobOut = 0;
+		addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
+		if(FASE_SIMULAZIONE == "stabilizzazione"){ // in caso di stabilizzazione
+			if (array_oss.size() == n) { // verifico se sono state generate tutte le n osservazioni
+				
+				sommaOss = 0.0;
+				mediaCampionaria = 0.0;
+		
+				for (int i = 0; i < n; i++) {
+					sommaOss += array_oss.get(i);
+				}
+				
+				mediaCampionaria = sommaOss/n; // calcolo la media campionaria
+				arrayCampionaria.add(mediaCampionaria); // memorizzo media campionaria del run in arrayCampionaria
+				// azzero le osservazioni del run corrente array_oss
+				// reimposto lo stato iniziale
+				if(arrayCampionaria.size() == p_run) {
+					
+					sommaMedia = 0.0;
+					sommaVarianza = 0.0;
+					
+					for (int j = 0; j <= p_run; j++) {
+						sommaMedia += arrayCampionaria.get(j);
+					}
+					
+					e_n = sommaMedia/p_run; // tramite lo stimatore di Gordon per la media calcolo e(n)
+			
+					for (int j = 0; j <= p_run; j++) {
+						sommaVarianza += Math.pow(arrayCampionaria.get(j) - e_n, 2);
+					}
+	
+					s2_n = (sommaVarianza/(p_run-1));
+					
+					// memorizzo e(n) e s2(n) in array_Stimatore_Gordon[] (credo di creare un array bidimensionale)
+				}
+				
+				
+			}
+		}
+	
 	}
 	
 	// aggiungo un evento al calendario e lo ordino per tempo di clock
