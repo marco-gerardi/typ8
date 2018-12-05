@@ -16,6 +16,7 @@ public class Scheduler {
 	private List<Event> calendar;
 	private Machine M1, M2, M3, M4;
 	private String FASE_SIMULAZIONE = "stabilizzazione";
+	private int NJobOut; // num di job che escono lungo la linea GammaOut
     //boolean fineM = false;
     double NX;
     String NXMachine;
@@ -79,10 +80,10 @@ public class Scheduler {
         		simFineM2(); 
         		break;
         	case Event.Fine_M3:
-        		// routine 
+        		simFineM3();
         		break;
         	case Event.Fine_M4:
-        		// routine 
+        		simFineM4();
         		break;
         	case Event.OSSERVAZIONE:
         		Osservazione();
@@ -104,6 +105,77 @@ public class Scheduler {
 //		System.out.println("K-Erl M4: "+C4.getNextNumber());
 //		System.out.println("------------------------------");	
 	}
+	
+	private void simFineM4(){
+		calendar.remove(0); // rimuovo l'evento dal calendario
+		NX = RoutingM1Out.getNextNumber();
+		System.out.println(NX);
+		if(NX < 0.1) {// il job va verso il centro M3
+			if (M3.statoLibero()) {
+				M3.setJob(M4.getJob()); // occupo M3 col job che prima era in M4
+				double TM3=C3.getNextHyperExp();// prevedo tempo di servizio  Tm3(j) 
+				addEvent(new Event(Event.Fine_M3, clock.getSimTime() + TM3)); // prevedo il prox evento di fine M3
+				System.out.println("TM3: "+TM3);
+			}
+			else {
+				CodaM3Lifo.add(M4.getJob()); // inserisco job in coda M3
+				System.out.println("Il job è stato inserito in codaM3");
+			}
+			 NXMachine = " vado verso Fine_M3";
+         }else  {// il job va verso il centro M1
+        	NJobOut++; // incremento la variabile NJobOUT
+ 			if (M1.statoLibero()) {
+				M1.setJob(M4.getJob()); // occupo M1 col job che prima era in M4
+				double TM1=C1.getNextExp(); // prevedo tempo di servizio  Tm1(j) 
+				addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
+				System.out.println("TM1: "+TM1);
+			}
+			else {
+				CodaM1Fifo.add(M4.getJob()); // inserisco job in coda M1
+				System.out.println("Il job è stato inserito in codaM1");
+			}
+      	 
+        	 NXMachine = "vado verso Fine_M1";
+         }
+		
+		if (CodaM4Sptf.isEmpty()) {
+			addEvent(new Event(Event.Fine_M4, Event.INFINITY )); // imposto M4 a evento non prevedibile
+		}
+		else {
+			M4.setJob(CodaM4Sptf.remove(0)); // rimuovo job dalla coda M4 e lo metto dentro M4
+			double TM4 = C4.getNextNumber(); // genero il tempo di servizio TM4
+			addEvent(new Event(Event.Fine_M4, clock.getSimTime() + TM4)); // prevedo il prox evento di fine M4			
+		}
+		 System.out.println("Route " + NXMachine); 
+	} // fine evento FineM4
+	
+	private void simFineM3() {
+		calendar.remove(0); // rimuovo l'evento dal calendario
+		NXMachine = "M3";
+		if (M4.statoLibero()) {
+			M4.setJob(M3.getJob()); // occupo M4 col job che prima era in M3
+			double TM4=C4.getNextNumber();// prevedo tempo di servizio  Tm4(j) 
+			addEvent(new Event(Event.Fine_M4, clock.getSimTime() + TM4)); // prevedo il prox evento di fine M4
+			//System.out.println("Il job è stato inserito in M4");
+		}
+		else {
+			double TM4=C4.getNextNumber();// prevedo tempo di servizio  Tm4(j)
+			Job tmp=M3.getJob();
+			tmp.setProcessingTime(TM4);
+			addJobToSPTF(tmp); // inserisco job in coda M4 e lo ordino
+			System.out.println("Il job è stato inserito in codaM4");
+		}
+		if (CodaM3Lifo.isEmpty()) {
+			addEvent(new Event(Event.Fine_M3, Event.INFINITY )); // imposto M3 a evento non prevedibile
+		}
+		else {
+			M3.setJob(CodaM3Lifo.remove(CodaM3Lifo.size()-1)); // rimuovo job dalla coda M3 e lo metto dentro M3
+			double TM3 = C3.getNextHyperExp(); // genero il tempo di servizio del centro M3
+			addEvent(new Event(Event.Fine_M3, clock.getSimTime() + TM3)); // prevedo il prox evento di fine M3		
+		}
+		 System.out.println("Route " + NXMachine);  
+
+    } // fine evento FineM3 
 
 	private void simFineM2() {
 		calendar.remove(0); // rimuovo l'evento dal calendario
@@ -147,18 +219,8 @@ public class Scheduler {
 			}
 			 System.out.println("Route " + NXMachine);  
         	 
-        	 
-        	 
- 
-			 
-        	 
          } // fine evento FineM2 
 		
-		
-	
-
-
-
 	private void simFineM1(){
 		calendar.remove(0); // rimuovo l'evento dal calendario
 		NX = RoutingM1Out.getNextNumber();
