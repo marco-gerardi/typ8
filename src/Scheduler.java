@@ -32,7 +32,7 @@ public class Scheduler {
 	double sommaVarianza;
 	double e_n;
 	double s2_n;
-	private int p_run = 50; //variabile che indica il numero di run da effettuare per la stabilizz.
+	private int p_run = 100; //variabile che indica il numero di run da effettuare per la stabilizz.
 	
 	public Scheduler() {
 		clock = new Clock();
@@ -57,7 +57,6 @@ public class Scheduler {
 	}
 	
 	public ArrayList<Integer> run(int n) { // simulo un run dello scheduler
-		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$n= "+n+" $$$$$$$$$$$$$$$$$$$$$$$$$$$");
 		//vettore osservazione Throughtput nel sistema
 		ArrayList<Integer> Throughtput = new ArrayList<Integer>();
 		// aggiungo i 5 job alla coda M1 - fase iniziale
@@ -79,7 +78,7 @@ public class Scheduler {
         	// guardo il calendario e vedo qual'è il primo evento
         	next = calendar.get(0).getE_id();
         	clock.setSimTime(calendar.get(0).getE_time()); // aggiorno il clock
-        	
+        	System.out.println("$$$$$$$$$$ CLOCK: "+clock.getSimTime());
         	
         	switch (next) {
         	case Event.Fine_M1:
@@ -116,8 +115,7 @@ public class Scheduler {
 	}
 	
 	private void imposta_stato_iniziale() {
-		clock.setSimTime(0.0); // init clock a 0.0
-		calendar.clear();// svuoto il calendario
+		clock.setSimTime(0.0);
 		// svuoto i centri di servizio
 		M1.rimuoviJob();
 		M2.rimuoviJob();
@@ -129,14 +127,6 @@ public class Scheduler {
 		CodaM2Lifo.clear(); 
 		CodaM3Lifo.clear(); 
 		CodaM4Sptf.clear();
-		
-		// impostiamo a 0 tutti i tempi di processamento dei job
-		job1.setProcessingTime(0);
-		job1.setProcessingTime(0);
-		job1.setProcessingTime(0);
-		job1.setProcessingTime(0);
-		job1.setProcessingTime(0);
-		
 		
 		// metto i 5 job in coda M1
 		CodaM1Fifo.add(job1); 
@@ -330,13 +320,13 @@ public class Scheduler {
 					sommaMedia = 0.0;
 					sommaVarianza = 0.0;
 					
-					for (int j = 0; j <= p_run; j++) {
+					for (int j = 0; j < p_run; j++) {
 						sommaMedia += arrayCampionaria.get(j);
 					}
 					
 					e_n = sommaMedia/p_run; // tramite lo stimatore di Gordon per la media calcolo e(n)
 			
-					for (int j = 0; j <= p_run; j++) {
+					for (int j = 0; j < p_run; j++) {
 						sommaVarianza += Math.pow(arrayCampionaria.get(j) - e_n, 2);
 					}
 	
