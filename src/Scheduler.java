@@ -21,7 +21,7 @@ public class Scheduler {
     double NX;
     String NXMachine;
     int next; // contiene il prossimo evento prelevato dal calendario eventi
-    private Job job1,job2,job3,job4,job5;
+    private Job job1,job2,job3,job4,job5, job6, job7, job8, job9, job10, job11, job12;
     double th = 0.0;
     private ArrayList<Double> array_oss = new ArrayList<Double>();
     private ArrayList<Double> arrayCampionaria = new ArrayList<Double>();
@@ -46,6 +46,13 @@ public class Scheduler {
 		job3=new Job(3);
 		job4=new Job(4);
 		job5=new Job(5);
+		job6=new Job(6);
+		job7=new Job(7);
+		job8=new Job(8);
+		job9=new Job(9);
+		job10=new Job(10);
+		job11=new Job(11);
+		job12=new Job(12);
 		M1=new Machine("M1");
 		M2=new Machine("M2");
 		M3=new Machine("M3");
@@ -117,6 +124,7 @@ public class Scheduler {
 	
 	private void imposta_stato_iniziale() {
 		clock.setSimTime(0.0);
+		Throughtput.clear();
 		// svuoto i centri di servizio
 		M1.rimuoviJob();
 		M2.rimuoviJob();
@@ -135,6 +143,13 @@ public class Scheduler {
 		CodaM1Fifo.add(job3);
 		CodaM1Fifo.add(job4);
 		CodaM1Fifo.add(job5);
+		CodaM1Fifo.add(job6);
+		CodaM1Fifo.add(job7);
+		CodaM1Fifo.add(job8);
+		CodaM1Fifo.add(job9);
+		CodaM1Fifo.add(job10);
+		CodaM1Fifo.add(job11);
+		CodaM1Fifo.add(job12);
 	}
 
 	private void simFineM4(){
