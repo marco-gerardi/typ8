@@ -33,6 +33,7 @@ public class Scheduler {
 	double e_n;
 	double s2_n;
 	private int p_run = 100; //variabile che indica il numero di run da effettuare per la stabilizz.
+	ArrayList<Double> Throughtput = new ArrayList<Double>();
 	
 	public Scheduler() {
 		clock = new Clock();
@@ -49,16 +50,16 @@ public class Scheduler {
 		M2=new Machine("M2");
 		M3=new Machine("M3");
 		M4=new Machine("M4");
-
+		
 		double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
 		System.out.println(TM1);
 		//addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
 		//addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
 	}
 	
-	public ArrayList<Integer> run(int n) { // simulo un run dello scheduler
+	public ArrayList<Double> run(int n) { // simulo un run dello scheduler
 		//vettore osservazione Throughtput nel sistema
-		ArrayList<Integer> Throughtput = new ArrayList<Integer>();
+		
 		// aggiungo i 5 job alla coda M1 - fase iniziale
 		imposta_stato_iniziale();
 
@@ -298,6 +299,7 @@ public class Scheduler {
 		calendar.remove(0);
 		 //System.out.println("Osservazione");
 		th = NJobOut/T_oss; // calcolo throughput
+		Throughtput.add(th);
 		array_oss.add(th); // memorizzo th nell'array
 		NJobOut = 0;
 		addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione

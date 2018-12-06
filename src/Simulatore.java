@@ -21,7 +21,7 @@ public class Simulatore {
 	//private ArrayList<Double> mediaC = new ArrayList<Double>(); // Gordon
 	private ArrayList<Double> media = new ArrayList<Double>();// Gordon
 	private ArrayList<Double> varianza = new ArrayList<Double>();// Gordon
-	ArrayList<Integer> Throughtput = new ArrayList<Integer>();
+	ArrayList<Double> Throughtput = new ArrayList<Double>();
 	private int i,j; // variabili per i contatori
 	public String FASE_SIMULAZIONE;
 	public static void main(String[] args)
