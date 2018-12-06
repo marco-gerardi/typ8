@@ -57,14 +57,12 @@ public class Scheduler {
 	}
 	
 	public ArrayList<Integer> run(int n) { // simulo un run dello scheduler
+		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$n= "+n+" $$$$$$$$$$$$$$$$$$$$$$$$$$$");
 		//vettore osservazione Throughtput nel sistema
 		ArrayList<Integer> Throughtput = new ArrayList<Integer>();
 		// aggiungo i 5 job alla coda M1 - fase iniziale
-		CodaM1Fifo.add(job1); 
-		CodaM1Fifo.add(job2);
-		CodaM1Fifo.add(job3);
-		CodaM1Fifo.add(job4);
-		CodaM1Fifo.add(job5);
+		imposta_stato_iniziale();
+
 		double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
 		System.out.println(TM1);
 		addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
@@ -117,6 +115,37 @@ public class Scheduler {
 //		System.out.println("------------------------------");	
 	}
 	
+	private void imposta_stato_iniziale() {
+		clock.setSimTime(0.0); // init clock a 0.0
+		calendar.clear();// svuoto il calendario
+		// svuoto i centri di servizio
+		M1.rimuoviJob();
+		M2.rimuoviJob();
+		M3.rimuoviJob();
+		M4.rimuoviJob();
+		
+		// svuoto le code
+		CodaM1Fifo.clear(); 
+		CodaM2Lifo.clear(); 
+		CodaM3Lifo.clear(); 
+		CodaM4Sptf.clear();
+		
+		// impostiamo a 0 tutti i tempi di processamento dei job
+		job1.setProcessingTime(0);
+		job1.setProcessingTime(0);
+		job1.setProcessingTime(0);
+		job1.setProcessingTime(0);
+		job1.setProcessingTime(0);
+		
+		
+		// metto i 5 job in coda M1
+		CodaM1Fifo.add(job1); 
+		CodaM1Fifo.add(job2);
+		CodaM1Fifo.add(job3);
+		CodaM1Fifo.add(job4);
+		CodaM1Fifo.add(job5);
+	}
+
 	private void simFineM4(){
 		calendar.remove(0); // rimuovo l'evento dal calendario
 		NX = RoutingM1Out.getNextNumber();
@@ -294,7 +323,7 @@ public class Scheduler {
 				
 				mediaCampionaria = sommaOss/n; // calcolo la media campionaria
 				arrayCampionaria.add(mediaCampionaria); // memorizzo media campionaria del run in arrayCampionaria
-				// azzero le osservazioni del run corrente array_oss
+				array_oss.clear();// azzero le osservazioni del run corrente array_oss
 				// reimposto lo stato iniziale
 				if(arrayCampionaria.size() == p_run) {
 					
