@@ -32,7 +32,7 @@ public class Machine {
 	
 	public Job getJob() {  // restituisco il job all'esterno e imposto a null il job della macchina
 		tmp = this.job;
-		this.job=null;
+		//this.job=null;
 		return tmp; 	
 		
 	}

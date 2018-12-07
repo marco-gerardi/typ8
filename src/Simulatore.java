@@ -35,7 +35,7 @@ public class Simulatore {
 		System.out.println("Costruttore del simulatore");
 		
 		scheduler = new Scheduler(); // istanzio lo scheduler
-		n0=2;
+		n0=100;
 		for ( i = 1; i <= n0; i++) { 
 			System.out.println("**** Ciclo: "+i+" ****************");
 			Throughtput= scheduler.run(i);
