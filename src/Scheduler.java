@@ -31,7 +31,7 @@ public class Scheduler {
 	
 	public Scheduler() {
 		clock = new Clock();
-		T_oss=14;
+		T_oss=10;
 		InizializzaGeneratori(0.8, 0.8, 0.4, 0.7, 0.3); // mu1, mu2, mu3, m4, p (per Hyperexp)
 		InizializzaCode();
 		calendar = new ArrayList<Event>(); // istanzio il calendar
@@ -49,22 +49,12 @@ public class Scheduler {
 		//System.out.println(TM1);
 		//addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
 		//addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
-	}
-	
-	public ArrayList<Double> run(int n) { // simulo un run dello scheduler di lunghezza n passato come parametro
-		//vettore osservazione Throughtput nel sistema
-		ArrayList<Double> Throughtput = new ArrayList<Double>();
-		// aggiungo i 12 job alla coda M1 - fase iniziale
-
 		// metto i 12 job in coda M1
 		for(int i=0;i<12;i++){
 			CodaM1Fifo.add(job.get(i)); 
-			
 		}
 		
-		Throughtput.clear();
-		
-		double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
+		//double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
 		//System.out.println(TM1);
 		addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
 		addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
@@ -73,6 +63,19 @@ public class Scheduler {
 		addEvent(new Event(Event.Fine_M4, Event.INFINITY )); // imposto M2 a evento non prevedibile
 		addEvent(new Event(Event.FINESIM, Event.INFINITY )); // imposto Finesim a evento non prevedibile
 		//M1.setJob(CodaM1Fifo.remove(0)); // rimuovo job dalla coda M1 e lo metto dentro M1
+		
+	}
+	
+	public ArrayList<Double> run(int n) { // simulo un run dello scheduler di lunghezza n passato come parametro
+		//vettore osservazione Throughtput nel sistema
+		ArrayList<Double> Throughtput = new ArrayList<Double>();
+		// aggiungo i 12 job alla coda M1 - fase iniziale
+
+
+		
+		Throughtput.clear();
+		
+
 		
         while (Throughtput.size()<n) {
         	//System.out.println(Throughtput.get(n));
@@ -378,7 +381,7 @@ public class Scheduler {
 	private void InizializzaGeneratori(double mu1, double mu2, double mu3, double mu4, double p) {
 		rg= new RandomGenerator();
 		RoutingM1Out=new UniformGenerator(5, 0, 1);// seme=5
-		RoutingM2Out=new UniformGenerator(11, 0, 1);// seme=11
+		RoutingM2Out=new UniformGenerator(5, 0, 1);// seme=11
 		RoutingM4Out=new UniformGenerator(7, 0, 1);// seme=7
 		C1=new ExponentialGenerator(5, mu1);// seme=5, mu=0.4
 		C2= new HyperExpGenerator(5, 7, mu2, p );
