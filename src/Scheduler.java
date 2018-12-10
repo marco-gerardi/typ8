@@ -79,7 +79,7 @@ public class Scheduler {
         	// guardo il calendario e vedo qual'è il primo evento
         	next = calendar.get(0).getE_id();
         	clock.setSimTime(calendar.get(0).getE_time()); // aggiorno il clock
-        	//System.out.println("$$$$$$$$$$ CLOCK: "+clock.getSimTime());
+        	System.out.println("$$$$$$$$$$ CLOCK: "+clock.getSimTime());
         	
         	switch (next) {
         	case Event.Fine_M1:
@@ -131,13 +131,14 @@ public class Scheduler {
 				System.out.println("Messo iljob da fine M4 in M3");
 			}
 			else {
-				CodaM3Lifo.add(M4.getJob()); // inserisco job in coda M3
+				CodaM3Lifo.add(M4.getJob()); // inserisco job in coda M3 con disciplina lifo
 				M4.rimuoviJob();
 				System.out.println("Il job è stato inserito in codaM3");
 			}
 			 
          }else  {// il job va verso il centro M1
         	NJobOut++; // incremento la variabile NJobOUT
+        	System.out.println("NJobOut: "+NJobOut);
  			if (M1.statoLibero()) {
  				//System.out.println("ID JOB FINE M4: "+M4.getJob().getId());
 				M1.setJob(M4.getJob()); // occupo M1 col job che prima era in M4
@@ -146,7 +147,7 @@ public class Scheduler {
 				addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
 				System.out.println("Messo iljob da fine M4 in M1");
 			}
-			else { // lo metto in coda M1
+			else { // lo metto in coda M1 con disciplina fifo
 				//System.out.println("ID JOB FINE M4: "+M4.getJob().getId());
 				//int idTmpM4 = M4.getJob().getId();
 				CodaM1Fifo.add(M4.getJob()); // inserisco job in coda M1
@@ -154,54 +155,61 @@ public class Scheduler {
 				System.out.println("Il job è stato inserito in codaM1");
 			}
          }
-		System.out.println("Mi giardo alle spalle e verifico se la coda M4 e vuota");
+		System.out.println("Mi guardo alle spalle e verifico se la coda M4 è vuota");
 		if (CodaM4Sptf.isEmpty()) {
 			addEvent(new Event(Event.Fine_M4, Event.INFINITY )); // imposto M4 a evento non prevedibile
 			System.out.println("la coda M4 è vuota e imposto a infinito il tempo di servizio di M4");
 		}
 		else {
-			System.out.println("la coda M4 NON è vuota, prelevo un job dalla coda");
-			M4.setJob(CodaM4Sptf.remove(0)); // rimuovo job dalla coda M4 e lo metto dentro M4
-			double TM4 = C4.getNextNumber(); // genero il tempo di servizio TM4
-			addEvent(new Event(Event.Fine_M4, clock.getSimTime() + TM4)); // prevedo il prox evento di fine M4			
+			System.out.println("la coda M4 NON è vuota, prelevo un job dalla coda SPTF");
+			Job tmp=new Job();
+			tmp=CodaM4Sptf.get(CodaM4Sptf.size() - 1);
+			M4.setJob(tmp); // rimuovo job dalla coda M4 e lo metto dentro M4
+			double TM4 =tmp.getProcessingTime() ; // prelevo il tempo di servizio dal job rimosso dalla coda
+			addEvent(new Event(Event.Fine_M4, clock.getSimTime() + TM4)); // prevedo il prox evento di fine M4
+			System.out.println("Il tempo di servizio del job prelevato dalla coda SPTF: "+TM4);
 		}
 		System.out.println("***** FINE Routine Fine M4");
 		 //System.out.println("Route " + NXMachine); 
 	} // fine evento FineM4
 	
+	
+	
+	
+	
 	private void simFineM3() {
+		System.out.println("***** Eseguo Routine Fine M3");
 		//clock.setSimTime(calendar.get(0).getE_time());
 		calendar.remove(0); // rimuovo l'evento dal calendario
 		NXMachine = "M3";
 		if (M4.statoLibero()) {
-			//System.out.println("ID JOB FINE M3: "+M3.getJob().getId());
 			M4.setJob(M3.getJob()); // occupo M4 col job che prima era in M3
 			M3.setJob(null);
 			double TM4=C4.getNextNumber();// prevedo tempo di servizio  Tm4(j) 
 			addEvent(new Event(Event.Fine_M4, clock.getSimTime() + TM4)); // prevedo il prox evento di fine M4
-			//System.out.println("Il job è stato inserito in M4");
+			System.out.println("Il job è stato inserito in M4");
 		}
 		else {
-			//System.out.println("ID JOB FINE M3: "+M3.getJob().getId());
-			int idTmpM3 = M3.getJob().getId();
 			double TM4=C4.getNextNumber();// prevedo tempo di servizio  Tm4(j)
-			Job tmp=M3.getJob();
+			Job tmp=new Job();
 			tmp.setProcessingTime(TM4);
 			addJobToSPTF(tmp); // inserisco job in coda M4 e lo ordino
-			job.add(new Job(idTmpM3)); 
-			CodaM1Fifo.add(job.get(idTmpM3));
-			//System.out.println("Il job è stato inserito in codaM4");
+			M3.setJob(null); // rimuovo il job da M3
+			System.out.println("Il job è stato inserito in codaM4");
 		}
+		System.out.println("Mi guardo alle spalle e verifico se la coda M3 è vuota");
 		if (CodaM3Lifo.isEmpty()) {
 			//M3.setJob(null);
 			addEvent(new Event(Event.Fine_M3, Event.INFINITY )); // imposto M3 a evento non prevedibile
+			System.out.println("la coda M3 è vuota e imposto a infinito il tempo di servizio di M3");
 		}
 		else {
 			M3.setJob(CodaM3Lifo.remove(CodaM3Lifo.size()-1)); // rimuovo job dalla coda M3 e lo metto dentro M3
 			double TM3 = C3.getNextHyperExp(); // genero il tempo di servizio del centro M3
-			addEvent(new Event(Event.Fine_M3, clock.getSimTime() + TM3)); // prevedo il prox evento di fine M3		
+			addEvent(new Event(Event.Fine_M3, clock.getSimTime() + TM3)); // prevedo il prox evento di fine M3	
+			System.out.println("la coda M3 NON è vuota, prelevo un job dalla coda");
 		}
-		 //System.out.println("Route " + NXMachine);  
+		System.out.println("***** FINE Routine Fine M3");
 
     } // fine evento FineM3 
 
@@ -320,9 +328,11 @@ public class Scheduler {
 	} // fine evento FineM1
 	
 	private ArrayList<Double> Osservazione(int n){
+		System.out.println("---------- INIZIO Osservazione");
 		//clock.setSimTime(calendar.get(0).getE_time());
 		calendar.remove(0);
 		th = NJobOut/T_oss; // calcolo throughput
+		System.out.println("TH= "+th);
 		//Throughtput.add(th);
 		array_oss.add(th); // memorizzo th nell'array
 		NJobOut = 0;
