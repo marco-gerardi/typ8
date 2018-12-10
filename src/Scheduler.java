@@ -21,7 +21,7 @@ public class Scheduler {
     double NX;
     String NXMachine;
     int next; // contiene il prossimo evento prelevato dal calendario eventi
-    private Job job1,job2,job3,job4,job5, job6, job7, job8, job9, job10, job11, job12;
+   // private Job job1,job2,job3,job4,job5, job6, job7, job8, job9, job10, job11, job12;
     
     double th = 0.0;
     private ArrayList<Job> job = new ArrayList<Job>();
@@ -31,7 +31,7 @@ public class Scheduler {
 	
 	public Scheduler() {
 		clock = new Clock();
-		T_oss=14;
+		T_oss=10;
 		InizializzaGeneratori(0.8, 0.8, 0.4, 0.7, 0.3); // mu1, mu2, mu3, m4, p (per Hyperexp)
 		InizializzaCode();
 		calendar = new ArrayList<Event>(); // istanzio il calendar
@@ -55,7 +55,13 @@ public class Scheduler {
 		//vettore osservazione Throughtput nel sistema
 		ArrayList<Double> Throughtput = new ArrayList<Double>();
 		// aggiungo i 12 job alla coda M1 - fase iniziale
-		imposta_stato_iniziale();
+
+		// metto i 12 job in coda M1
+		for(int i=0;i<12;i++){
+			CodaM1Fifo.add(job.get(i)); 
+			
+		}
+		
 		Throughtput.clear();
 		
 		double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
@@ -108,27 +114,6 @@ public class Scheduler {
 //		System.out.println("------------------------------");	
 	}
 	
-	private void imposta_stato_iniziale() {
-		clock.setSimTime(0.0);
-		//Throughtput.clear();
-		// svuoto i centri di servizio
-		M1.rimuoviJob();
-		M2.rimuoviJob();
-		M3.rimuoviJob();
-		M4.rimuoviJob();
-		
-		// svuoto le code
-		CodaM1Fifo.clear(); 
-		CodaM2Lifo.clear(); 
-		CodaM3Lifo.clear(); 
-		CodaM4Sptf.clear();
-		
-		// metto i 12 job in coda M1
-		for(int i=0;i<12;i++){
-			CodaM1Fifo.add(job.get(i)); 
-			//job.add(new Job(i));
-		}
-	}
 
 	private void simFineM4(){
 		//clock.setSimTime(calendar.get(0).getE_time());
