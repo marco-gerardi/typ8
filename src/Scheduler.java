@@ -36,6 +36,7 @@ public class Scheduler {
 		InizializzaCode();
 		calendar = new ArrayList<Event>(); // istanzio il calendar
 		// istranzio i job
+		
 		for(int i=1;i<=12;i++){
 			job.add(new Job(i));
 		}
@@ -50,32 +51,25 @@ public class Scheduler {
 		//addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
 		//addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
 		// metto i 12 job in coda M1
+		
+		// aggiungo i 12 job alla coda M1 - fase iniziale
 		for(int i=0;i<12;i++){
 			CodaM1Fifo.add(job.get(i)); 
 		}
 		
-		//double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
-		//System.out.println(TM1);
 		addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
 		addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
 		addEvent(new Event(Event.Fine_M2, Event.INFINITY )); // imposto M2 a evento non prevedibile
 		addEvent(new Event(Event.Fine_M3, Event.INFINITY )); // imposto M2 a evento non prevedibile
 		addEvent(new Event(Event.Fine_M4, Event.INFINITY )); // imposto M2 a evento non prevedibile
 		addEvent(new Event(Event.FINESIM, Event.INFINITY )); // imposto Finesim a evento non prevedibile
-		//M1.setJob(CodaM1Fifo.remove(0)); // rimuovo job dalla coda M1 e lo metto dentro M1
-		
 	}
 	
 	public ArrayList<Double> run(int n) { // simulo un run dello scheduler di lunghezza n passato come parametro
 		//vettore osservazione Throughtput nel sistema
 		ArrayList<Double> Throughtput = new ArrayList<Double>();
-		// aggiungo i 12 job alla coda M1 - fase iniziale
 
-
-		
 		Throughtput.clear();
-		
-
 		
         while (Throughtput.size()<n) {
         	//System.out.println(Throughtput.get(n));
