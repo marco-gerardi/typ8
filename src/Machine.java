@@ -30,10 +30,8 @@ public class Machine {
 	public String getIdMachine() { return idMachine; }
 	public void setIdMachine(String idMachine) { 	this.idMachine = idMachine; }
 	
-	public Job getJob() {  // restituisco il job all'esterno e imposto a null il job della macchina
-		tmp = this.job;
-		//this.job=null;
-		return tmp; 	
+	public Job getJob() {  // restituisco il job all'esterno 
+		return this.job; 	
 		
 	}
 }
