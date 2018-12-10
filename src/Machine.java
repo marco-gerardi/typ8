@@ -20,8 +20,9 @@ public class Machine {
 	
 	//Rimuove il job dalla machine
 	 
-	public void rimuoviJob(){ job = null; }
-	
+	public void rimuoviJob(){ 
+		job = null; 
+	}
 	/***
 	 * Assegna il job al processore
 	 * @param job = job da assegnare

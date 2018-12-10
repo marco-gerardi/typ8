@@ -31,7 +31,7 @@ public class Scheduler {
 	
 	public Scheduler() {
 		clock = new Clock();
-		T_oss=7;
+		T_oss=14;
 		InizializzaGeneratori(0.8, 0.8, 0.4, 0.7, 0.3); // mu1, mu2, mu3, m4, p (per Hyperexp)
 		InizializzaCode();
 		calendar = new ArrayList<Event>(); // istanzio il calendar
@@ -95,10 +95,7 @@ public class Scheduler {
         		simFineM4();
         		break;
         	case Event.OSSERVAZIONE:
-        		Throughtput = Osservazione(n);
-        		break;
-        	case Event.FINESIM:
-        		// routine 
+        		Throughtput = Osservazione();
         		break;
 
         	} 
@@ -184,7 +181,7 @@ public class Scheduler {
 		NXMachine = "M3";
 		if (M4.statoLibero()) {
 			M4.setJob(M3.getJob()); // occupo M4 col job che prima era in M3
-			M3.setJob(null);
+			M3.rimuoviJob();
 			double TM4=C4.getNextNumber();// prevedo tempo di servizio  Tm4(j) 
 			addEvent(new Event(Event.Fine_M4, clock.getSimTime() + TM4)); // prevedo il prox evento di fine M4
 			System.out.println("Il job è stato inserito in M4");
@@ -194,7 +191,7 @@ public class Scheduler {
 			Job tmp=new Job();
 			tmp.setProcessingTime(TM4);
 			addJobToSPTF(tmp); // inserisco job in coda M4 e lo ordino
-			M3.setJob(null); // rimuovo il job da M3
+			M3.rimuoviJob(); // rimuovo il job da M3
 			System.out.println("Il job è stato inserito in codaM4 SPTF");
 			System.out.println("Il job è stato inserito in codaM4 SPTF, il tempo di servizio è: " +TM4);
 		}
@@ -224,7 +221,7 @@ public class Scheduler {
 			if (M1.statoLibero()) {
 				//System.out.println("ID JOB FINE M2: "+M2.getJob().getId());
 				M1.setJob(M2.getJob()); // occupo M1 col job che prima era in M2
-				M2.setJob(null);
+				M2.rimuoviJob();
 				double TM1=C1.getNextExp();// prevedo tempo di servizio  Tm1(j) 
 				addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
 				System.out.println("Il job è stato prelevato da M2 e inserito in M1");
@@ -249,7 +246,7 @@ public class Scheduler {
  				Job tmp=new Job();
  				tmp.setProcessingTime(TM4);
  				addJobToSPTF(tmp); // inserisco job in coda M4 e lo ordino
- 				M2.setJob(null); // rimuovo il job da M2
+ 				M2.rimuoviJob(); // rimuovo il job da M2
  				System.out.println("Il job è stato inserito in codaM4 SPTF");
  				System.out.println("Il job è stato inserito in codaM4 SPTF, il tempo di servizio è: " +TM4);
  			}
@@ -258,7 +255,7 @@ public class Scheduler {
           }
 			System.out.println("Mi guardo alle spalle e verifico se la coda M2 è vuota");
 			if (CodaM2Lifo.isEmpty()) {
-				//M2.setJob(null);
+				
 				addEvent(new Event(Event.Fine_M2, Event.INFINITY )); // imposto M2 a evento non prevedibile
 				System.out.println("la coda M2 è vuota e imposto a infinito il tempo di servizio di M2");
 			}
@@ -330,9 +327,9 @@ public class Scheduler {
 		System.out.println("***** FINE Routine Fine M1"); 
 	} // fine evento FineM1
 	
-	private ArrayList<Double> Osservazione(int n){
+	private ArrayList<Double> Osservazione(){
 		System.out.println("---------- INIZIO Osservazione");
-		//clock.setSimTime(calendar.get(0).getE_time());
+		System.out.println("Clock Osservazione: "+calendar.get(0).getE_time());
 		calendar.remove(0);
 		th = NJobOut/T_oss; // calcolo throughput
 		System.out.println("TH= "+th);
