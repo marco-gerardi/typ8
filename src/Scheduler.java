@@ -22,24 +22,16 @@ public class Scheduler {
     String NXMachine;
     int next; // contiene il prossimo evento prelevato dal calendario eventi
     private Job job1,job2,job3,job4,job5, job6, job7, job8, job9, job10, job11, job12;
-    ArrayList<Double> Throughtput;
+    
     double th = 0.0;
     private ArrayList<Job> job = new ArrayList<Job>();
     private ArrayList<Double> array_oss = new ArrayList<Double>();
-    private ArrayList<Double> arrayCampionaria = new ArrayList<Double>();
-    private ArrayList<Double> array_Stimatore_Gordon = new ArrayList<Double>();
-    double sommaOss;
-	double mediaCampionaria;
-	double sommaMedia;
-	double sommaVarianza;
-	double e_n;
-	double s2_n;
-	private int p_run = 100; //variabile che indica il numero di run da effettuare per la stabilizz.
+    
 	
 	
 	public Scheduler() {
 		clock = new Clock();
-		T_oss=10;
+		T_oss=14;
 		InizializzaGeneratori(0.8, 0.8, 0.4, 0.7, 0.3); // mu1, mu2, mu3, m4, p (per Hyperexp)
 		InizializzaCode();
 		calendar = new ArrayList<Event>(); // istanzio il calendar
@@ -54,19 +46,20 @@ public class Scheduler {
 		M4=new Machine("M4");
 		
 		double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
-		System.out.println(TM1);
+		//System.out.println(TM1);
 		//addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
 		//addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
 	}
 	
 	public ArrayList<Double> run(int n) { // simulo un run dello scheduler di lunghezza n passato come parametro
 		//vettore osservazione Throughtput nel sistema
-		Throughtput = new ArrayList<Double>();
+		ArrayList<Double> Throughtput = new ArrayList<Double>();
 		// aggiungo i 12 job alla coda M1 - fase iniziale
 		imposta_stato_iniziale();
-
+		Throughtput.clear();
+		
 		double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
-		System.out.println(TM1);
+		//System.out.println(TM1);
 		addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
 		addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
 		addEvent(new Event(Event.Fine_M2, Event.INFINITY )); // imposto M2 a evento non prevedibile
@@ -75,13 +68,12 @@ public class Scheduler {
 		addEvent(new Event(Event.FINESIM, Event.INFINITY )); // imposto Finesim a evento non prevedibile
 		M1.setJob(CodaM1Fifo.remove(0)); // rimuovo job dalla coda M1 e lo metto dentro M1
 		
-
-        
         while (Throughtput.size()<n) {
+        	//System.out.println(Throughtput.get(n));
         	// guardo il calendario e vedo qual'è il primo evento
         	next = calendar.get(0).getE_id();
         	clock.setSimTime(calendar.get(0).getE_time()); // aggiorno il clock
-        	System.out.println("$$$$$$$$$$ CLOCK: "+clock.getSimTime());
+        	//System.out.println("$$$$$$$$$$ CLOCK: "+clock.getSimTime());
         	
         	switch (next) {
         	case Event.Fine_M1:
@@ -97,7 +89,7 @@ public class Scheduler {
         		simFineM4();
         		break;
         	case Event.OSSERVAZIONE:
-        		Osservazione(n);
+        		Throughtput = Osservazione(n);
         		break;
         	case Event.FINESIM:
         		// routine 
@@ -105,7 +97,6 @@ public class Scheduler {
 
         	} 
         }
-				
 		return Throughtput; 	
 //		System.out.println("Rnd: "+rg.getNextNumber());
 //		System.out.println("RoutingM1Out: "+RoutingM1Out.getNextNumber());
@@ -119,7 +110,7 @@ public class Scheduler {
 	
 	private void imposta_stato_iniziale() {
 		clock.setSimTime(0.0);
-		Throughtput.clear();
+		//Throughtput.clear();
 		// svuoto i centri di servizio
 		M1.rimuoviJob();
 		M2.rimuoviJob();
@@ -143,7 +134,7 @@ public class Scheduler {
 		//clock.setSimTime(calendar.get(0).getE_time());
 		calendar.remove(0); // rimuovo l'evento dal calendario
 		NX = RoutingM1Out.getNextNumber();
-		System.out.println(NX);
+		//System.out.println(NX);
 		if(NX < 0.1) {// il job va verso il centro M3
 			if (M3.statoLibero()) {
 				//System.out.println("ID JOB FINE M4: "+M4.getJob().getId());
@@ -151,7 +142,7 @@ public class Scheduler {
 				M4.rimuoviJob();
 				double TM3=C3.getNextHyperExp();// prevedo tempo di servizio  Tm3(j) 
 				addEvent(new Event(Event.Fine_M3, clock.getSimTime() + TM3)); // prevedo il prox evento di fine M3
-				System.out.println("TM3: "+TM3);
+				//System.out.println("TM3: "+TM3);
 			}
 			else {
 				//System.out.println("ID JOB FINE M4: "+M4.getJob().getId());
@@ -159,7 +150,7 @@ public class Scheduler {
 				CodaM3Lifo.add(M4.getJob()); // inserisco job in coda M3
 				job.add(new Job(idTmpM4));   
 				CodaM1Fifo.add(job.get(idTmpM4));
-				System.out.println("Il job è stato inserito in codaM3");
+				//System.out.println("Il job è stato inserito in codaM3");
 			}
 			 NXMachine = " vado verso Fine_M3";
          }else  {// il job va verso il centro M1
@@ -170,7 +161,7 @@ public class Scheduler {
 				M4.rimuoviJob();
 				double TM1=C1.getNextExp(); // prevedo tempo di servizio  Tm1(j) 
 				addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
-				System.out.println("TM1: "+TM1);
+				//System.out.println("TM1: "+TM1);
 			}
 			else {
 				//System.out.println("ID JOB FINE M4: "+M4.getJob().getId());
@@ -178,7 +169,7 @@ public class Scheduler {
 				CodaM1Fifo.add(M4.getJob()); // inserisco job in coda M1
 				job.add(new Job(idTmpM4));  
 				CodaM1Fifo.add(job.get(idTmpM4));
-				System.out.println("Il job è stato inserito in codaM1");
+				//System.out.println("Il job è stato inserito in codaM1");
 			}
       	 
         	 NXMachine = "vado verso Fine_M1";
@@ -193,7 +184,7 @@ public class Scheduler {
 			double TM4 = C4.getNextNumber(); // genero il tempo di servizio TM4
 			addEvent(new Event(Event.Fine_M4, clock.getSimTime() + TM4)); // prevedo il prox evento di fine M4			
 		}
-		 System.out.println("Route " + NXMachine); 
+		 //System.out.println("Route " + NXMachine); 
 	} // fine evento FineM4
 	
 	private void simFineM3() {
@@ -217,7 +208,7 @@ public class Scheduler {
 			addJobToSPTF(tmp); // inserisco job in coda M4 e lo ordino
 			job.add(new Job(idTmpM3)); 
 			CodaM1Fifo.add(job.get(idTmpM3));
-			System.out.println("Il job è stato inserito in codaM4");
+			//System.out.println("Il job è stato inserito in codaM4");
 		}
 		if (CodaM3Lifo.isEmpty()) {
 			//M3.setJob(null);
@@ -228,7 +219,7 @@ public class Scheduler {
 			double TM3 = C3.getNextHyperExp(); // genero il tempo di servizio del centro M3
 			addEvent(new Event(Event.Fine_M3, clock.getSimTime() + TM3)); // prevedo il prox evento di fine M3		
 		}
-		 System.out.println("Route " + NXMachine);  
+		 //System.out.println("Route " + NXMachine);  
 
     } // fine evento FineM3 
 
@@ -243,7 +234,7 @@ public class Scheduler {
 				M2.setJob(null);
 				double TM1=C1.getNextExp();// prevedo tempo di servizio  Tm1(j) 
 				addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1
-				System.out.println("Il job è stato inserito in M1");
+				//System.out.println("Il job è stato inserito in M1");
 			}
 			else {
 				//System.out.println("ID JOB FINE M2: "+M2.getJob());
@@ -251,7 +242,7 @@ public class Scheduler {
 				CodaM1Fifo.add(M2.getJob()); // inserisco job in coda M1
 				job.add(new Job(idTmpM2)); 
 				CodaM1Fifo.add(job.get(idTmpM2));
-				System.out.println("Il job è stato inserito in codaM1");
+				//System.out.println("Il job è stato inserito in codaM1");
 			}
          } else { // il job va verso M4
         	 
@@ -261,7 +252,7 @@ public class Scheduler {
  				M2.setJob(null);
  				double TM4=C4.getNextNumber();// prevedo tempo di servizio  Tm4(j) 
  				addEvent(new Event(Event.Fine_M4, clock.getSimTime() + TM4)); // prevedo il prox evento di fine M4
- 				System.out.println("Il job è stato inserito in M4");
+ 				//System.out.println("Il job è stato inserito in M4");
  			}
  			else { // M4 è occupato
  				//System.out.println("ID JOB FINE M2: "+M2.getJob().getId());
@@ -272,10 +263,10 @@ public class Scheduler {
  				addJobToSPTF(tmp); // inserisco job in coda M4 e lo ordino
  				job.add(new Job(idTmpM2)); 
 				CodaM1Fifo.add(job.get(idTmpM2));
- 				System.out.println("Il job è stato inserito in codaM4");
+ 				//System.out.println("Il job è stato inserito in codaM4");
  			}
        	 
-  			System.out.println("fine M2");
+  			//System.out.println("fine M2");
           }
 			if (CodaM2Lifo.isEmpty()) {
 				//M2.setJob(null);
@@ -286,7 +277,7 @@ public class Scheduler {
 				double TM2 = C2.getNextHyperExp(); // genero il tempo di servizio del centro M2
 				addEvent(new Event(Event.Fine_M2, clock.getSimTime() + TM2)); // prevedo il prox evento di fine M2			
 			}
-			 System.out.println("Route " + NXMachine);  
+			 //System.out.println("Route " + NXMachine);  
         	 
          } // fine evento FineM2 
 		
@@ -294,7 +285,7 @@ public class Scheduler {
 		//clock.setSimTime(calendar.get(0).getE_time());
 		calendar.remove(0); // rimuovo l'evento dal calendario
 		NX = RoutingM1Out.getNextNumber();
-		System.out.println(NX);
+		//System.out.println(NX);
 		if(NX >= 0.3) {// il job va verso il centro M2
 			if (M2.statoLibero()) {
 				//System.out.println("ID JOB FINE M1: "+M1.getJob().getId());
@@ -302,7 +293,7 @@ public class Scheduler {
 				M1.rimuoviJob();
 				double TM2=C2.getNextHyperExp();// prevedo tempo di servizio  Tm2(j) 
 				addEvent(new Event(Event.Fine_M2, clock.getSimTime() + TM2)); // prevedo il prox evento di fine M2
-				System.out.println("TM2: "+TM2);
+				//System.out.println("TM2: "+TM2);
 			}
 			else {
 				//System.out.println("ID JOB FINE M1: "+M1.getJob().getId());
@@ -310,7 +301,7 @@ public class Scheduler {
 				CodaM2Lifo.add(M1.getJob()); // inserisco job in coda M2
 				job.add(new Job(idTmpM1));  
 				CodaM1Fifo.add(job.get(idTmpM1));
-				System.out.println("Il job è stato inserito in codaM2");
+				//System.out.println("Il job è stato inserito in codaM2");
 			}
 			 NXMachine = " vado verso Fine_M2";
          }else  {// il job va verso il centro M3
@@ -320,7 +311,7 @@ public class Scheduler {
 				M1.setJob(null);
 				double TM3=C3.getNextHyperExp();// prevedo tempo di servizio  Tm3(j) 
 				addEvent(new Event(Event.Fine_M3, clock.getSimTime() + TM3)); // prevedo il prox evento di fine M3
-				System.out.println("TM3: "+TM3);
+				//System.out.println("TM3: "+TM3);
 			}
 			else {
 				//System.out.println("ID JOB FINE M1: "+M1.getJob().getId());
@@ -328,7 +319,7 @@ public class Scheduler {
 				CodaM3Lifo.add(M1.getJob()); // inserisco job in coda M3
 				job.add(new Job(idTmpM1));  
 				CodaM1Fifo.add(job.get(idTmpM1)); 
-				System.out.println("Il job è stato inserito in codaM3");
+				//System.out.println("Il job è stato inserito in codaM3");
 			}
       	 
         	 NXMachine = "vado verso Fine_M3";
@@ -343,57 +334,21 @@ public class Scheduler {
 			double TM1 = C1.getNextExp(); // genero il tempo di servizio del centro1 M1
 			addEvent(new Event(Event.Fine_M1, clock.getSimTime() + TM1)); // prevedo il prox evento di fine M1			
 		}
-		 System.out.println("Route " + NXMachine); 
+		 //System.out.println("Route " + NXMachine); 
 	} // fine evento FineM1
 	
-	private void Osservazione(int n){
+	private ArrayList<Double> Osservazione(int n){
 		//clock.setSimTime(calendar.get(0).getE_time());
 		calendar.remove(0);
-		System.out.println("++++++++++ Start Routine Osservazione");
 		th = NJobOut/T_oss; // calcolo throughput
-		Throughtput.add(th);
+		//Throughtput.add(th);
 		array_oss.add(th); // memorizzo th nell'array
 		NJobOut = 0;
 		addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
-		if(FASE_SIMULAZIONE == "stabilizzazione"){ // in caso di stabilizzazione
-			if (array_oss.size() == n) { // verifico se sono state generate tutte le n osservazioni
-				
-				sommaOss = 0.0;
-				mediaCampionaria = 0.0;
+		return array_oss;
 		
-				for (int i = 0; i < n; i++) {
-					sommaOss += array_oss.get(i);
-				}
-				
-				mediaCampionaria = sommaOss/n; // calcolo la media campionaria
-				arrayCampionaria.add(mediaCampionaria); // memorizzo media campionaria del run in arrayCampionaria
-				array_oss.clear();// azzero le osservazioni del run corrente array_oss
-				// reimposto lo stato iniziale
-				if(arrayCampionaria.size() == p_run) {
-					
-					sommaMedia = 0.0;
-					sommaVarianza = 0.0;
-					
-					for (int j = 0; j < p_run; j++) {
-						sommaMedia += arrayCampionaria.get(j);
-					}
-					
-					e_n = sommaMedia/p_run; // tramite lo stimatore di Gordon per la media calcolo e(n)
-			
-					for (int j = 0; j < p_run; j++) {
-						sommaVarianza += Math.pow(arrayCampionaria.get(j) - e_n, 2);
-					}
-	
-					s2_n = (sommaVarianza/(p_run-1));
-					
-					// memorizzo e(n) e s2(n) in array_Stimatore_Gordon[] (credo di creare un array bidimensionale)
-				}
-				
-				
-			}
-		}
-		System.out.println("TH= "+th);
-		System.out.println("---------- FINE Osservazione");
+		//System.out.println("TH= "+th);
+		//System.out.println("---------- FINE Osservazione");
 	
 	}
 	
