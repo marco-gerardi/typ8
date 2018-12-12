@@ -6,6 +6,7 @@ import java.util.List;
 public class Scheduler {
 	private Clock clock;
 	private double T_oss; // intervallo di osservazione Delta T
+	private double Dt = 14; //intervallo tra due osservazioni
 	RandomGenerator rg;
 	UniformGenerator RoutingM1Out, RoutingM2Out, RoutingM4Out; // Routing job uscenti dal centro 1 e dal centro 4
 	ExponentialGenerator C1; // Esponenziale per il centro 1
@@ -31,7 +32,7 @@ public class Scheduler {
 	
 	public Scheduler() {
 		clock = new Clock();
-		T_oss=14;
+		T_oss=Dt;
 		InizializzaGeneratori(0.8, 0.8, 0.4, 0.7, 0.3); // mu1, mu2, mu3, m4, p (per Hyperexp)
 		InizializzaCode();
 		calendar = new ArrayList<Event>(); // istanzio il calendar
@@ -327,13 +328,18 @@ public class Scheduler {
 	private ArrayList<Double> Osservazione(){
 		System.out.println("---------- INIZIO Osservazione");
 		System.out.println("Clock Osservazione: "+calendar.get(0).getE_time());
+		// genero prossimo osservazione
+	    //T_oss = T_oss + Dt;
+		System.out.println("Prossima Osservazione: "+T_oss);
 		calendar.remove(0);
-		th = NJobOut/T_oss; // calcolo throughput
+		addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
+
+		th = (NJobOut/T_oss); // calcolo throughput
+		NJobOut = 0;
 		System.out.println("TH= "+th);
 		//Throughtput.add(th);
 		array_oss.add(th); // memorizzo th nell'array
-		NJobOut = 0;
-		addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
+		
 		return array_oss;
 		
 		//System.out.println("TH= "+th);

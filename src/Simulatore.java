@@ -47,20 +47,70 @@ public class Simulatore {
 		System.out.println("Costruttore del simulatore");
 		
 		scheduler = new Scheduler(); // istanzio lo scheduler
-		n0=200;
+		n0=10;
 		for ( i = 1; i <= n0; i++) { 
 			System.out.println("*********************************************** Ciclo: "+i+" ****************");
 			Throughtput= scheduler.run(i);
 			//System.out.println("Valore Throughtput: "+ Throughtput.get(i));
 			//System.out.println("lunghezza della lista Throughtput: "+ Throughtput.size());
 			// TODO: calcola media campionaria di ogni run
+			sommaOss = 0.0;
+			mediaCampionaria = 0.0;
+			for (int j = 0; j < Throughtput.size(); j++) { 
+				//System.out.println("Run numero " + j);
+				sommaOss += Throughtput.get(j);
+			}
+			System.out.println("sommaOss " + sommaOss);
+			System.out.println("Throughtput.size() " + Throughtput.size());
 			
+			mediaCampionaria = sommaOss/Throughtput.size(); // calcolo la media campionaria
+			arrayCampionaria.add(mediaCampionaria); // memorizzo media campionaria del run in arrayCampionaria
 			
+			if(arrayCampionaria.size() <= p_run) {
+				sommaMedia = 0.0;
+				sommaVarianza = 0.0;
+				
+				for (int j = 0; j < arrayCampionaria.size(); j++) { 
+					sommaMedia += arrayCampionaria.get(j);
+				}
+	
+				e_n = sommaMedia/arrayCampionaria.size(); // tramite lo stimatore di Gordon per la media calcolo e(n)
+				
+				//aggiunge la media del run attuale in un vettore
+				array_Stimatore_GordonEn.add(e_n);
+				
+				for (int z = 0; z < arrayCampionaria.size(); z++) {
+					sommaVarianza += Math.pow(arrayCampionaria.get(z) - array_Stimatore_GordonEn.get(z), 2);
+				}
+				
+				s2_n = Math.sqrt(sommaVarianza / array_Stimatore_GordonEn.size());
+				//aggiunge la varianza del run attuale in un vettore
+				array_Stimatore_GordonS2n.add(s2_n);
+	
+				System.out.println("Media campionaria: " + mediaCampionaria);
+				System.out.println("Media: " + e_n);
+				System.out.println("Varianza: " + s2_n);
+			}
+		
 		}
-		for (int j = 0; j < Throughtput.size(); j++) { 
-			System.out.println("Valore Throughtput: "+ Throughtput.get(j));
+		//stampa delle curve di Gordon della media campionaria, della media e della varianza
+		System.out.println("\nCurva di Gordon della media campionaria:");
+		for (int i = 0; i < arrayCampionaria.size(); i++)
+		{
+			System.out.print(arrayCampionaria.get(i) + "\n");
 		}
-		if(FASE_SIMULAZIONE == "stabilizzazione"){ // in caso di stabilizzazione
+		System.out.println("\n\nCurva di Gordon della media:");
+		for (int i = 0; i < array_Stimatore_GordonEn.size(); i++)
+		{
+			System.out.print(array_Stimatore_GordonEn.get(i) + "\n");
+		}
+		System.out.println("\n\nCurva di Gordon della varianza:");
+		for (int i = 0; i < array_Stimatore_GordonS2n.size(); i++)
+		{
+			System.out.print(array_Stimatore_GordonS2n.get(i) + "\n");
+		}
+		
+		/*if(FASE_SIMULAZIONE == "stabilizzazione"){ // in caso di stabilizzazione
 			if (Throughtput.size() == n0) { // verifico se sono state generate tutte le n osservazioni
 				for ( i = 1; i <= Throughtput.size(); i++) {
 					System.out.println("Run numero " + i);
@@ -68,11 +118,11 @@ public class Simulatore {
 					mediaCampionaria = 0.0;
 			
 					for (int i = 0; i < n0; i++) {
-						mediaCampionaria += Throughtput.get(i);
+						sommaOss += Throughtput.get(i);
 						//System.out.println("sommaOss: "+ mediaCampionaria);
 					}
 					
-					mediaCampionaria /= n0; // calcolo la media campionaria
+					mediaCampionaria = sommaOss/n0; // calcolo la media campionaria
 					arrayCampionaria.add(mediaCampionaria); // memorizzo media campionaria del run in arrayCampionaria
 					
 					System.out.println("mediaCampionaria: "+ mediaCampionaria);
@@ -105,7 +155,7 @@ public class Simulatore {
 					
 				}
 			}
-		}
+		}*/
 	
 		
 		//TODO: stampa delle curve di Gordon della media campionaria, della media e della varianza

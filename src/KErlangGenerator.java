@@ -2,7 +2,7 @@ public class KErlangGenerator {
 
 	//costanti per seme generatore e k 
 	private final static int defaultK = 2;
-	private final static long defaultX = 103;
+	private final static long defaultX = 139;
 	//dichiarazione variabili generatore
 	private ExponentialGenerator eg;
 	private int k;
