@@ -6,7 +6,7 @@ import java.util.List;
 public class Scheduler {
 	private Clock clock;
 	private double T_oss; // intervallo di osservazione Delta T
-	private double Dt = 14; //intervallo tra due osservazioni
+	private double Dt = 2.8; //intervallo tra due osservazioni
 	RandomGenerator rg;
 	UniformGenerator RoutingM1Out, RoutingM2Out, RoutingM4Out; // Routing job uscenti dal centro 1 e dal centro 4
 	ExponentialGenerator C1; // Esponenziale per il centro 1
@@ -70,7 +70,6 @@ public class Scheduler {
 		//vettore osservazione Throughtput nel sistema
 		ArrayList<Double> Throughtput = new ArrayList<Double>();
 
-		Throughtput.clear();
 		
         while (Throughtput.size()<n) {
         	//System.out.println(Throughtput.get(n));
@@ -330,7 +329,7 @@ public class Scheduler {
 		System.out.println("Clock Osservazione: "+calendar.get(0).getE_time());
 		// genero prossimo osservazione
 	    //T_oss = T_oss + Dt;
-		System.out.println("Prossima Osservazione: "+T_oss);
+		//System.out.println("Prossima Osservazione: "+T_oss);
 		calendar.remove(0);
 		addEvent(new Event(Event.OSSERVAZIONE, clock.getSimTime()+T_oss)); //prevedo il prossimo evento di osservazione
 
@@ -342,9 +341,6 @@ public class Scheduler {
 		
 		return array_oss;
 		
-		//System.out.println("TH= "+th);
-		//System.out.println("---------- FINE Osservazione");
-	
 	}
 	
 	// aggiungo un evento al calendario e lo ordino per tempo di clock

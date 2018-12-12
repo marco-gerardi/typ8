@@ -33,7 +33,7 @@ public class Simulatore {
 	double sommaVarianza;
 	double e_n;
 	double s2_n;
-	private int p_run = 5; //variabile che indica il numero di run da effettuare per la stabilizz.
+	private int p_run = 30; //variabile che indica il numero di run da effettuare per la stabilizz.
 	
 	
 	public static void main(String[] args)
@@ -47,7 +47,7 @@ public class Simulatore {
 		System.out.println("Costruttore del simulatore");
 		
 		scheduler = new Scheduler(); // istanzio lo scheduler
-		n0=10;
+		n0=100;
 		for ( i = 1; i <= n0; i++) { 
 			System.out.println("*********************************************** Ciclo: "+i+" ****************");
 			Throughtput= scheduler.run(i);
