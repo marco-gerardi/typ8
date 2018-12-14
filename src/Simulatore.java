@@ -27,13 +27,14 @@ public class Simulatore {
 	private ArrayList<Double> arrayCampionaria = new ArrayList<Double>();
     private ArrayList<Double> array_Stimatore_GordonEn = new ArrayList<Double>();
     private ArrayList<Double> array_Stimatore_GordonS2n = new ArrayList<Double>();
+    double valoreCentrale;
     double sommaOss;
 	double mediaCampionaria;
 	double sommaMedia;
 	double sommaVarianza;
 	double e_n;
 	double s2_n;
-	private int p_run = 30; //variabile che indica il numero di run da effettuare per la stabilizz.
+	private int p_run = 50; //variabile che indica il numero di run da effettuare per la stabilizz.
 	
 	
 	public static void main(String[] args)
@@ -47,17 +48,18 @@ public class Simulatore {
 		System.out.println("Costruttore del simulatore");
 		
 		scheduler = new Scheduler(); // istanzio lo scheduler
-		n0=100;
+		n0=200;
 		for ( i = 1; i <= n0; i++) { 
 			System.out.println("*********************************************** Ciclo: "+i+" ****************");
 			Throughtput= scheduler.run(i);
-			//System.out.println("Valore Throughtput: "+ Throughtput.get(i));
+			
 			//System.out.println("lunghezza della lista Throughtput: "+ Throughtput.size());
 			// TODO: calcola media campionaria di ogni run
 			sommaOss = 0.0;
 			mediaCampionaria = 0.0;
 			for (int j = 0; j < Throughtput.size(); j++) { 
 				//System.out.println("Run numero " + j);
+				System.out.println("Valore Throughtput: "+ Throughtput.get(j));
 				sommaOss += Throughtput.get(j);
 			}
 			System.out.println("sommaOss " + sommaOss);
@@ -109,6 +111,97 @@ public class Simulatore {
 		{
 			System.out.print(array_Stimatore_GordonS2n.get(i) + "\n");
 		}
+		
+		// FASE STATISTICA
+		System.out.println("\n\n\n*** FASE STATISTICA ***\n");
+		ArrayList<Double> campioni_media = new ArrayList<Double>();
+		ArrayList<Double> medie = new ArrayList<Double>();
+		ArrayList<Double> varianze = new ArrayList<Double>();
+		ArrayList<Double> muMINs = new ArrayList<Double>();
+		ArrayList<Double> muMAXs = new ArrayList<Double>();
+		double intervallo_confidenza = 1.685; 
+		//esecuzione di p run	
+		for (int i = 1; i <= n0; i++)
+		{
+			Throughtput.clear();
+			valoreCentrale = 0;
+			for (int j = 1; j <= p_run; j++)
+			{
+				Throughtput= scheduler.run(j);
+			}
+			
+			for (int z = 0; z < Throughtput.size(); z++) { 
+				System.out.println("Run numero "+z+": " + Throughtput.get(z));
+			}
+			valoreCentrale = Throughtput.get(Throughtput.size()/2);
+			array_batch.add(valoreCentrale);
+			//batchArr.addAll(Throughtput);
+			System.out.println("stat"+i+": "+Throughtput.size());
+			System.out.println("posizione centrale "+Throughtput.size()/2);
+			System.out.println("value posizione centrale "+valoreCentrale);
+		}
+		
+		for (int z = 0; z < p_run; z++)
+		{
+			//System.out.println("valoreCentrale array Batch "+z+": "+array_batch.get(z));
+			//Calcoliamo la media campionaria
+			
+			double media_campionaria1 = 0;
+			
+			for (int u = 0; u < array_batch.size(); u++)
+			{
+				media_campionaria1 += array_batch.get(u);
+			}
+			
+			media_campionaria1 /= array_batch.size();
+			campioni_media.add(media_campionaria1);
+			
+			// Calcoliamo la media
+			
+			double media1 = 0;
+			
+			for (int c = 0; c < campioni_media.size(); c++)
+			{
+				media1 += campioni_media.get(c);
+			}
+			media1 /= campioni_media.size();
+			medie.add(media1);
+			
+			// Calcoliamo la varianza
+			
+			double varianza1 = 0;
+			
+			for (int a = 0; a < campioni_media.size(); a++)
+			{
+				varianza1 += Math.pow(campioni_media.get(a) - medie.get(a), 2);
+			}
+			
+			varianza1 = Math.sqrt(varianza1 / medie.size());
+			varianze.add(varianza1);
+			
+			
+			// Calcoliamo l'intervallo di confidenza
+			
+			System.out.println("Intervallo di confidenza: ");
+		     
+			double d = Math.sqrt(Math.pow(varianza1, 2) / array_batch.size());
+			double muMin = media1 - (d * intervallo_confidenza);
+			double muMax = media1 + (d * intervallo_confidenza);
+			
+			muMINs.add(muMin);
+			muMAXs.add(muMax);
+			System.out.println("muMIN: " + muMin);
+			System.out.println("muMAX: " + muMax);
+			
+		}
+		
+		
+	     //print.stampa("MU MIN: "+muMin, name);
+     //c4.append("MU MIN: "+muMin+" \n");
+     
+     //print.stampa("MU MIN: "+muMax, name);
+     //c4.append("MU MIN: "+muMax+" \n");
+		
 		
 		/*if(FASE_SIMULAZIONE == "stabilizzazione"){ // in caso di stabilizzazione
 			if (Throughtput.size() == n0) { // verifico se sono state generate tutte le n osservazioni

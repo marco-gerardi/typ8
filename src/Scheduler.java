@@ -6,7 +6,7 @@ import java.util.List;
 public class Scheduler {
 	private Clock clock;
 	private double T_oss; // intervallo di osservazione Delta T
-	private double Dt = 2.8; //intervallo tra due osservazioni
+	private double Dt = 3.5; //intervallo tra due osservazioni
 	RandomGenerator rg;
 	UniformGenerator RoutingM1Out, RoutingM2Out, RoutingM4Out; // Routing job uscenti dal centro 1 e dal centro 4
 	ExponentialGenerator C1; // Esponenziale per il centro 1
