@@ -77,6 +77,10 @@ public class Simulatore {
 			s2_n = Math.sqrt(sommaVarianza / array_Stimatore_GordonEn.size());
 			//aggiunge la varianza del run attuale in un vettore
 			array_Stimatore_GordonS2n.add(s2_n);
+			
+			System.out.println("Media campionaria: " + mediaCampionaria);
+			System.out.println("Media: " + e_n);
+			System.out.println("Varianza: " + s2_n);
 		}
 	}
 	
@@ -160,18 +164,35 @@ public class Simulatore {
 		
 		scheduler = new Scheduler(mu1,mu3,mu3,mu4,p,T_oss); // istanzio lo scheduler
 		
-		/*for ( n = 1; n <= n0; n++) { 
+		for ( n = 1; n <= n0; n++) { 
 			System.out.println("*********************************************** Ciclo: "+i+" ****************");
 			Throughtput= scheduler.run(n);
 			OsservazioneStabilizzazione(Throughtput,n);
-		}*/
+		}
 		
-		for ( n = 1; n <= n0; n++) { 
+		//stampa delle curve di Gordon della media campionaria, della media e della varianza
+		System.out.println("\nCurva di Gordon della media campionaria:");
+		for (int i = 0; i < arrayCampionaria.size(); i++)
+		{
+			System.out.print(arrayCampionaria.get(i) + "\n");
+		}
+		System.out.println("\n\nCurva di Gordon della media:");
+		for (int i = 0; i < array_Stimatore_GordonEn.size(); i++)
+		{
+			System.out.print(array_Stimatore_GordonEn.get(i) + "\n");
+		}
+		System.out.println("\n\nCurva di Gordon della varianza:");
+		for (int i = 0; i < array_Stimatore_GordonS2n.size(); i++)
+		{
+			System.out.print(array_Stimatore_GordonS2n.get(i) + "\n");
+		}
+		
+		/*for ( n = 1; n <= n0; n++) { 
 			System.out.println("*********************************************** Ciclo: "+i+" ****************");
 			Throughtput= scheduler.run(n);
 			OsservazioneStatistica(Throughtput,n);
 		}
-		ResultStatistica(array_batch,p_batch);
+		ResultStatistica(array_batch,p_batch);*/
 		/*for (int i = 0; i < arrayCampionaria.size(); i++)
 		{
 			System.out.print(arrayCampionaria.get(i) + "\n");
